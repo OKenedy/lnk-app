@@ -1,182 +1,1004 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>LNK</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
-<style>
-:root{--navy:#0b2a6b;--deep:#04143f;--sky:#5b9bd5;--gold:#f5b800;--bg:#eef3ff;--card:#fff;--ink:#0a1a44;--mute:#5b6a8f;--line:#d5e0fa;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#050d2b;--card:#0d1c4d;--ink:#e9efff;--mute:#9db0e0;--line:#1f3375}}
-:root[data-theme="dark"]{--bg:#050d2b;--card:#0d1c4d;--ink:#e9efff;--mute:#9db0e0;--line:#1f3375}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box}
-body{margin:0;font-family:"Bricolage Grotesque",system-ui,sans-serif;background:var(--deep);color:var(--ink)}
-.app{max-width:460px;margin:0 auto;min-height:100dvh;background:var(--bg);padding-bottom:90px;position:relative}
-.top{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:#0b2a6b;color:#fff}
-.pts{color:var(--gold);font-weight:600;font-size:14px}
-.wm{font-weight:800;letter-spacing:-.02em;display:inline-flex;align-items:center;line-height:1}.wm svg{margin:0 1px}
-main{padding:8px 16px}
-h1{font-size:26px;margin:14px 0 2px;letter-spacing:-.02em}h2{margin:0 0 6px;font-size:22px}h3{margin:18px 0 6px;font-size:17px}
-.mute,.note{color:var(--mute);font-size:14px;margin:2px 0}.note{font-size:12px;margin-top:10px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
-.hero{background:#0b2a6b;color:#fff;border-radius:20px;padding:20px;margin:14px 0}.hero p{color:#c5d5ff;margin:0 0 14px;line-height:1.4}
-.btn{border:0;background:var(--gold);color:#04143f;font:inherit;font-weight:800;padding:12px 18px;border-radius:12px;cursor:pointer}
-.btn.alt{background:transparent;border:1px solid var(--line);color:var(--ink);font-weight:600}.btn.big{width:100%;margin-top:16px;padding:15px;font-size:17px}.btn.sm{padding:8px 12px;font-size:14px}
-.back{background:none;border:0;color:var(--sky);font:inherit;padding:8px 0;cursor:pointer}
-label{display:block;font-weight:600;font-size:14px;margin:14px 0 6px}
-input,select{width:100%;font:inherit;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);margin:5px 0}
-.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{font:inherit;padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
-.chip.on{background:var(--gold);color:#04143f;border-color:var(--gold);font-weight:800}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stats div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}.stats b{display:block;font-size:22px}.stats span{font-size:12px;color:var(--mute)}
-.bar{display:grid;grid-template-columns:1fr auto;gap:3px 8px;margin:10px 0;font-size:14px}.bar i{grid-column:1/3;height:8px;border-radius:4px;background:var(--sky);display:block}.bar b{color:var(--mute)}
-.row{display:flex;gap:8px;align-items:center;margin-top:10px}.row select{margin:0}
-.person{display:flex;gap:12px;align-items:center}.av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;flex:none}.person>div:nth-child(2){flex:1;min-width:0}
-.tag{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:3px 8px;font-size:12px;font-weight:600}
-.acts{display:flex;gap:8px;margin-top:12px}
-.auth{background:#0b2a6b;color:#fff;margin:-8px -16px;padding:48px 20px 40px;min-height:100dvh}.auth .tag{background:none;border:0;color:#c5d5ff;font-size:16px;padding:8px 0 20px;display:block}
-.auth input,.auth select{background:#fff;color:#0a1a44;border:0}.auth label{color:#c5d5ff}.auth .chip{background:#14357f;color:#fff;border-color:#2a4a9a}.auth .chip.on{background:var(--gold);color:#04143f}
-.seg{display:flex;background:#14357f;border-radius:12px;padding:4px;margin-bottom:12px}.seg button{flex:1;border:0;background:none;color:#c5d5ff;font:inherit;padding:10px;border-radius:9px;cursor:pointer}.seg .on{background:#fff;color:#0a1a44;font-weight:800}
-.err{color:#ffb4b4;font-size:14px;min-height:18px;margin:6px 0 0}.note.l{color:#c5d5ff}
-#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(460px,100%);background:#0b2a6b;display:none;padding-bottom:env(safe-area-inset-bottom,0px)}
-#nav button{flex:1;background:none;border:0;border-top:3px solid transparent;color:#c5d5ff;font:inherit;padding:14px 4px}#nav .on{color:var(--gold);border-top-color:var(--gold);font-weight:800}
-.bub{max-width:80%;padding:10px 14px;border-radius:16px;margin:6px 0;background:var(--card);border:1px solid var(--line)}.bub.me{margin-left:auto;background:#0b2a6b;color:#fff;border-color:#0b2a6b}
-.send{display:flex;gap:8px;margin-top:12px}.send input{margin:0}
-.prog{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:8px 0}.prog i{display:block;height:100%;background:var(--gold)}
-.stars button{font-size:34px;background:none;border:0;color:var(--gold);cursor:pointer}
-#fcard{transition:opacity .7s,filter .7s,transform .7s}#fcard.melt{opacity:0;filter:blur(8px);transform:scale(.96)}
-#ov{position:fixed;inset:0;background:rgba(4,20,63,.95);opacity:0;pointer-events:none;transition:opacity .5s;z-index:50}#ov.on{opacity:1;pointer-events:auto}
-#fx{position:absolute;inset:0;width:100%;height:100%}#lm{position:absolute;top:calc(42% + 100px);left:0;right:0;text-align:center;color:#fff;font-weight:600;font-size:18px;padding:0 20px}
-#md{position:fixed;inset:0;background:rgba(4,20,63,.6);display:none;align-items:flex-end;justify-content:center;z-index:40}#md.on{display:flex}
-.sheet{background:var(--card);width:min(460px,100%);padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px));border-radius:20px 20px 0 0}
-#tt{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--gold);color:#04143f;font-weight:800;padding:10px 18px;border-radius:999px;display:none;z-index:60}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
-@media (min-width: 700px){
-  body{min-height:100dvh;padding:32px 24px;background:radial-gradient(ellipse at top,#163a82 0,var(--deep) 68%)}
-  .app{max-width:1100px;min-height:calc(100dvh - 64px);padding-bottom:110px;border:1px solid rgba(255,255,255,.12);border-radius:24px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.25)}
-  .top{padding:20px 40px}
-  main{max-width:1000px;margin:0 auto;padding:32px 48px 40px}
-  h1{font-size:32px}
-  .hero{padding:28px 32px}
-  #nav{bottom:24px;width:min(920px,calc(100% - 48px));padding-bottom:0;border-radius:16px;box-shadow:0 12px 32px rgba(4,20,63,.3);z-index:20}
-  #nav button{padding:16px 12px}
-  #md{align-items:center}
-  .sheet{width:min(560px,calc(100% - 48px));border-radius:20px;margin:24px}
-  .auth{display:flex;flex-direction:column;justify-content:center;min-height:calc(100dvh - 64px);margin:-32px -48px;padding:64px clamp(48px,12vw,128px)}
-  .auth>*{width:min(100%,520px);margin-right:auto;margin-left:auto}
-}
-</style></head>
-<body><div class="app"><div class="top" id="top"></div><main id="main"></main><div id="nav"></div></div>
-<div id="ov"><canvas id="fx"></canvas><div id="lm"></div></div><div id="md"></div><div id="tt"></div>
-<script>
-const $=s=>document.querySelector(s),mem={};
-const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return mem[k]!==undefined?mem[k]:d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){mem[k]=v}}};
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const logo=(s,c)=>`<span class="wm" style="font-size:${s}px;color:${c||"#fff"}">L<svg viewBox="0 0 24 24" width="${s*.8}" height="${s*.8}" fill="none" stroke="#f5b800" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>NK</span>`;
-/* Courses: programme -> levels 100;200;300;400. Edit freely. */
-const P={"Computer Science":"Introduction to Computer Science|Programming Fundamentals;Object-Oriented Programming|Discrete Mathematics;CSC 301 Data Structures|CSC 308 Operating Systems|CSC 312 Compiler Construction|CSC 317 Numerical Analysis;Machine Learning|Final Year Project",
-"Software Engineering":"Programming Fundamentals|Calculus;Object-Oriented Programming|Database Systems;CSC 301 Data Structures|CSC 308 Operating Systems|SEN 313 Compiler Construction|CSC 317 Numerical Analysis|SEN 322 Innovation and New Technologies;Software Project Management|Final Year Project",
-"Data Science":"Statistics I|Programming Fundamentals;Probability|Databases;Data Mining|Statistical Modelling;Machine Learning|Capstone Project",
-"Accounting":"Principles of Accounting|Business Mathematics;Financial Accounting|Cost Accounting;Auditing|Taxation;Advanced Financial Reporting|Strategic Management Accounting",
-"Business Administration":"Introduction to Business|Principles of Management;Marketing|Organisational Behaviour;Operations Management|Business Law;Strategic Management|Business Research Methods",
-"Economics":"Principles of Economics|Business Mathematics;Microeconomics|Macroeconomics;Econometrics|Development Economics;International Economics|Research Project",
-"Finance":"Principles of Finance|Business Mathematics;Corporate Finance|Financial Markets;Investment Analysis|Financial Modelling;Risk Management|Portfolio Management",
-"Mass Communication":"Introduction to Mass Communication|Writing for Media;Journalism|Public Relations;Broadcasting|Media Law and Ethics;Media Research|Final Year Project",
-"Information Science and Media Studies":"Introduction to Digital Media|Information Science;Web Design|Digital Storytelling;Data and Media Analytics|Digital Marketing;Media Strategy|Final Year Project"};
-const GEN=["Communication in English","Logic","Philosophy and Human Existence","Introduction to Theology","World Civilizations","Peace Studies and Conflict Resolution","General Ethics","Contemporary Health Issues","Philosophical Anthropology","Entrepreneurship"];
-const own=(p,l)=>P[p].split(";")[l/100-1].split("|"),courses=(p,l)=>[...own(p,l),...GEN];
-const NAMES=["Tolu Adeyemi","Chidi Okafor","Amaka Nwosu","Femi Balogun","Zainab Yusuf","Emeka Uche","Ngozi Eze","Kunle Sanni","Ife Williams","Bisi Alabi"],COL=["#0b2a6b","#2a6fb5","#7a4cc2","#1b8a6b","#c2571a"],SLOTS=["Mon 4:00 pm","Wed 2:00 pm","Fri 11:00 am","Sat 10:00 am"];
-const hash=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))>>>0;return h};
-const tutors=(c,l)=>{const h=hash(c);return [0,1,2,3].map(i=>({n:NAMES[(h+i*3)%10],r:(4.3+((h>>i)%7)/10).toFixed(1),l:Math.min(400,l+100),s:12+(h+i*5)%40,p:(h+i)%2?0:1500,c:COL[(h+i)%5]})).sort((a,b)=>b.r-a.r)};
-const initials=n=>n.split(" ").map(w=>w[0]).join("").slice(0,2);
-let S=Object.assign({user:null,sessions:[],chats:{},pts:0,groups:[],demand:{"CSC 301 Data Structures":14,"CSC 308 Operating Systems":11,"CSC 317 Numerical Analysis":9,"Financial Accounting":7,"Microeconomics":5}},store.get("lnk",{}));
-S.view=S.user?"home":"auth";S.au={mode:"up",level:100};S.F=null;
-const save=()=>{const{view,au,F,bk,th,...r}=S;store.set("lnk",r)};
-const badge=()=>S.pts>=50?"Scholar":S.pts>=20?"Study Buddy":"Starter";
-const toast=t=>{const e=$("#tt");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",2000)};
-const modal=h=>{$("#md").innerHTML=`<div class="sheet">${h}</div>`;$("#md").classList.add("on")};
-const chips=(arr,cur,a)=>`<div class="chips">${arr.map(x=>`<button class="chip ${cur==x?"on":""}" data-a="${a}" data-v="${esc(x)}">${esc(x)}</button>`).join("")}</div>`;
-const opts=(arr,cur)=>arr.map(x=>`<option ${x==cur?"selected":""}>${esc(x)}</option>`).join("");
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b2a6b">
+  <meta name="description" content="A private study planner for organising courses, study requests and sessions.">
+  <title>LNK — Study planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&display=swap">
+  <style>
+    :root {
+      color-scheme: light;
+      --navy: #0b2a6b;
+      --deep: #04143f;
+      --blue: #2a6fb5;
+      --sky: #e9f2ff;
+      --gold: #f5b800;
+      --bg: #f3f6fc;
+      --card: #fff;
+      --ink: #132044;
+      --muted: #65708b;
+      --line: #e1e7f2;
+      --success: #16794b;
+      --danger: #b42332;
+      font-family: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
 
-const V={
-auth(){const up=S.au.mode=="up";return `<div class="auth">${logo(54)}<span class="tag">Find the right study partner, fast.</span>
-<div class="seg"><button class="${up?"on":""}" data-a="mode" data-v="up">Sign up</button><button class="${up?"":"on"}" data-a="mode" data-v="in">Sign in</button></div>
-${up?`<input id="nm" placeholder="Full name" autocomplete="name">`:""}<input id="em" type="email" placeholder="School email" autocomplete="email"><input id="pw" type="password" placeholder="Password (6+ characters)" autocomplete="${up?"new-password":"current-password"}">
-${up?`<label>Level</label><div class="chips" id="alv">${[100,200,300,400].map(l=>`<button class="chip ${S.au.level==l?"on":""}" data-a="alv" data-v="${l}">${l}</button>`).join("")}</div><label>Programme</label><select id="pg">${opts(Object.keys(P))}</select>`:""}
-<p class="err" id="er"></p><button class="btn big" data-a="${up?"signup":"signin"}">${up?"Create account":"Sign in"}</button><p class="note l">Demo: accounts are saved only in this browser.</p></div>`},
-home(){const u=S.user,cs=courses(u.prog,u.level),d=Object.entries(S.demand).sort((a,b)=>b[1]-a[1]).slice(0,5),mx=d[0][1];
-return `<h1>Hi, ${esc(u.name.split(" ")[0])}</h1><p class="mute">Level ${u.level} · ${esc(u.prog)}</p>
-<div class="hero"><h2>Stuck on a course?</h2><p>Pick your level and course. We’ll find tutors and study groups that fit your schedule.</p><button class="btn" data-a="go" data-v="match">Get matched</button></div>
-<div class="stats"><div><b>${S.sessions.length}</b><span>Sessions</span></div><div><b>${S.pts}</b><span>Points</span></div><div><b style="font-size:15px;padding:5px 0">${badge()}</b><span>Badge</span></div></div>
-<div class="card"><h3 style="margin-top:0">Where students need help now</h3>${d.map(([k,v])=>`<div class="bar"><span>${esc(k)}</span><b>${v}</b><i style="width:${v/mx*100}%"></i></div>`).join("")}
-<div class="row"><select id="rq">${opts(cs)}</select><button class="btn alt sm" data-a="req">Request help</button></div><p class="note">Demo numbers. Your requests are added to this chart.</p></div>`},
-match(){const F=S.F,cs=own(F.prog,F.level);if(![...cs,...GEN].includes(F.course))F.course=cs[0];
-return `<button class="back" data-a="go" data-v="home">Back</button><h1>Find your match</h1><div class="card" id="fcard">
-<label style="margin-top:0">Your level</label>${chips([100,200,300,400],F.level,"lvl")}
-<label>Programme</label><select data-a="prog">${opts(Object.keys(P),F.prog)}</select>
-<label>Course</label><select data-a="crs" id="cs"><optgroup label="${esc(F.prog)}">${opts(cs,F.course)}</optgroup><optgroup label="General studies">${opts(GEN,F.course)}</optgroup></select>
-<label>I want</label>${chips(["Tutor","Study group","Both"],F.want,"want")}
-<button class="btn big" data-a="match">Match me</button></div>`},
-results(){const F=S.F;let h=`<button class="back" data-a="go" data-v="match">Change filters</button><h1>${esc(F.course)}</h1><p class="mute">Level ${F.level} · ${esc(F.prog)}</p>`;
-if(F.want!="Study group")h+="<h3>Tutors</h3>"+tutors(F.course,F.level).map(t=>`<div class="card"><div class="person"><div class="av" style="background:${t.c}">${initials(t.n)}</div><div><b>${t.n}</b><div class="mute">Level ${t.l} · ★ ${t.r} · ${t.s} sessions</div></div><span class="tag">${t.p?"₦"+t.p.toLocaleString()+"/hr":"Free"}</span></div><div class="acts"><button class="btn sm" data-a="book" data-v="${t.n}">Book</button><button class="btn alt sm" data-a="chat" data-v="${t.n}">Message</button></div></div>`).join("");
-if(F.want!="Tutor")h+="<h3>Study groups</h3>"+[["Study Circle",5,"Tue 5:00 pm"],["Exam Prep Crew",8,"Sat 10:00 am"]].map(([n,m,w],i)=>{const id=F.course+i,j=S.groups.includes(id);return `<div class="card"><div class="person"><div class="av" style="background:${COL[i+1]}">${m}</div><div><b>${esc(F.course)} ${n}</b><div class="mute">${m} members · ${w}</div></div><button class="btn ${j?"alt":""} sm" data-a="join" data-v="${esc(id)}">${j?"Joined":"Join"}</button></div></div>`}).join("");
-return h+`<p class="note">Sample tutors and groups for the demo.</p>`},
-sessions(){return `<h1>Your sessions</h1>`+(S.sessions.length?S.sessions.map((s,i)=>`<div class="card"><b>${esc(s.c)}</b><div class="mute">with ${s.t} · ${s.slot}</div><div class="acts">${s.st?`<span class="tag">Rated ${"★".repeat(s.st)}</span>`:`<button class="btn sm" data-a="rate" data-v="${i}">Mark done and rate</button>`}</div></div>`).join(""):`<p class="mute">No sessions yet. Use Get matched, then book a tutor.</p>`)},
-chat(){const ks=Object.keys(S.chats);return `<h1>Messages</h1>`+(ks.length?ks.map(k=>`<button class="card person" style="width:100%;font:inherit;color:inherit;text-align:left;cursor:pointer" data-a="chat" data-v="${k}"><div class="av" style="background:${COL[hash(k)%5]}">${initials(k)}</div><div><b>${k}</b><div class="mute">${esc(S.chats[k].slice(-1)[0].t)}</div></div></button>`).join(""):`<p class="mute">No chats yet. Message a tutor from your matches.</p>`)},
-thread(){const k=S.th;return `<button class="back" data-a="go" data-v="chat">Back</button><h1>${k}</h1>`+S.chats[k].map(m=>`<div class="bub ${m.me?"me":""}">${esc(m.t)}</div>`).join("")+`<div class="send"><input id="mi" placeholder="Write a message" autocomplete="off"><button class="btn" data-a="send">Send</button></div>`},
-profile(){const u=S.user,n=S.pts>=50?50:S.pts>=20?50:20;return `<h1>${esc(u.name)}</h1><p class="mute">${esc(u.email)}<br>Level ${u.level} · ${esc(u.prog)}</p>
-<div class="card"><h3 style="margin-top:0">${badge()}</h3><div class="prog"><i style="width:${Math.min(100,S.pts/n*100)}%"></i></div><p class="mute">${S.pts} points. Book (+5), join a group (+5), rate a session (+10).</p></div>
-<div class="acts"><button class="btn alt" data-a="out">Sign out</button><button class="btn alt" data-a="reset">Reset demo data</button></div>`}};
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #07122e;
+      --card: #101f43;
+      --ink: #edf2ff;
+      --muted: #a7b3d0;
+      --line: #26375d;
+      --sky: #152950;
+      --success: #78d6a5;
+      --danger: #ff939c;
+    }
 
-function render(){const v=S.view,li=!!S.user;$("#top").style.display=li?"flex":"none";$("#nav").style.display=li?"flex":"none";
-if(li){$("#top").innerHTML=`${logo(26)}<span class="pts">★ ${S.pts} pts</span>`;const t=v=="thread"?"chat":v=="match"||v=="results"?"home":v;
-$("#nav").innerHTML=[["home","Home"],["sessions","Sessions"],["chat","Chat"],["profile","Profile"]].map(([k,l])=>`<button class="${t==k?"on":""}" data-a="go" data-v="${k}">${l}</button>`).join("")}
-$("#main").innerHTML=V[v]();scrollTo(0,0)}
-const go=v=>{S.view=v;render()};
-const steps=()=>["Reading your filters","Checking "+S.F.course+" tutors","Comparing availability","Ranking by rating"];
+    * { box-sizing: border-box; }
+    html { min-height: 100%; scroll-padding-top: 20px; }
+    body { min-height: 100vh; margin: 0; background: var(--bg); color: var(--ink); }
+    button, input, select, textarea { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { touch-action: manipulation; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid #5b9bd5;
+      outline-offset: 3px;
+    }
+    a { color: var(--blue); }
+    .app { min-height: 100vh; }
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 66px;
+      padding: 12px 20px;
+      background: var(--navy);
+      color: #fff;
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; }
+    .brand-name { font-size: 23px; font-weight: 800; letter-spacing: -.05em; }
+    .brand-icon { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 12px; background: var(--gold); color: var(--deep); }
+    .brand-icon svg { width: 22px; height: 22px; }
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+    .privacy-pill { display: inline-flex; align-items: center; gap: 6px; color: #dce8ff; font-size: 12px; }
+    .privacy-pill svg { width: 15px; height: 15px; }
+    .top-button {
+      display: inline-flex;
+      min-height: 40px;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255,255,255,.32);
+      border-radius: 10px;
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+    }
+    .layout { display: block; min-height: calc(100vh - 66px); }
+    .side-nav { display: none; }
+    main { width: 100%; max-width: 940px; min-width: 0; margin: 0 auto; padding: 22px 18px 108px; }
+    .welcome { max-width: 740px; min-height: calc(100dvh - 100px); display: grid; align-content: center; margin: 0 auto; }
+    h1 { margin: 6px 0 8px; font-size: clamp(27px, 5vw, 38px); line-height: 1.12; letter-spacing: -.04em; }
+    h2 { margin: 0 0 8px; font-size: 21px; letter-spacing: -.025em; }
+    h3 { margin: 0 0 6px; font-size: 16px; }
+    p { line-height: 1.55; }
+    .eyebrow { margin: 0 0 8px; color: var(--blue); font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .muted { color: var(--muted); }
+    .intro { max-width: 620px; margin: 0 0 24px; color: var(--muted); font-size: 16px; }
+    .privacy-note { display: flex; align-items: flex-start; gap: 12px; margin: 14px 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .privacy-note strong { color: var(--ink); }
+    .privacy-note svg { flex: 0 0 19px; width: 19px; height: 19px; color: var(--blue); }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      margin: 18px 0;
+      padding: 25px;
+      border-radius: 20px;
+      background: linear-gradient(125deg, #0b2a6b, #174a95);
+      color: #fff;
+    }
+    .hero::after { position: absolute; right: -34px; bottom: -96px; width: 220px; height: 220px; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; content: ""; box-shadow: 0 0 0 26px rgba(255,255,255,.035), 0 0 0 54px rgba(255,255,255,.03); }
+    .hero h2 { position: relative; z-index: 1; max-width: 540px; font-size: clamp(23px, 4vw, 30px); }
+    .hero p { position: relative; z-index: 1; max-width: 560px; margin: 8px 0 18px; color: #dce8ff; }
+    .hero .button { position: relative; z-index: 1; }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0; }
+    .stat { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 15px; background: var(--card); }
+    .stat strong { display: block; overflow: hidden; font-size: 23px; text-overflow: ellipsis; white-space: nowrap; }
+    .stat span { color: var(--muted); font-size: 12px; }
+    .card { min-width: 0; padding: 17px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: 0 3px 12px rgba(19,32,68,.035); }
+    .card + .card { margin-top: 12px; }
+    .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 22px 0 10px; }
+    .section-heading h2 { margin: 0; }
+    .empty { padding: 25px 18px; border: 1px dashed var(--line); border-radius: 15px; color: var(--muted); text-align: center; }
+    .empty p { margin: 6px 0 12px; font-size: 14px; }
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 15px;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      background: var(--gold);
+      color: #17213b;
+      font-weight: 800;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform .15s ease, filter .15s ease, background .15s ease;
+    }
+    .button:hover { filter: brightness(.97); transform: translateY(-1px); }
+    .button:active { transform: translateY(0); }
+    .button svg { width: 17px; height: 17px; }
+    .button.secondary { border-color: var(--line); background: var(--card); color: var(--ink); }
+    .button.danger { border-color: color-mix(in srgb, var(--danger) 30%, transparent); background: transparent; color: var(--danger); }
+    .button.small { min-height: 38px; padding: 8px 11px; font-size: 13px; }
+    .button.full { width: 100%; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .field { display: grid; gap: 6px; margin: 14px 0; }
+    .field label { font-size: 13px; font-weight: 700; }
+    .field small, .help { color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .input {
+      width: 100%;
+      min-height: 46px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--card);
+      color: var(--ink);
+    }
+    textarea.input { min-height: 100px; resize: vertical; }
+    .input::placeholder { color: var(--muted); opacity: .8; }
+    .form-grid { display: grid; grid-template-columns: 1fr; gap: 0 14px; }
+    .request-head, .item-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .request-course { margin: 0 0 5px; color: var(--blue); font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+    .request-title { margin: 0; font-size: 17px; overflow-wrap: anywhere; }
+    .request-details { margin: 10px 0; color: var(--muted); font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .meta { display: flex; flex-wrap: wrap; gap: 7px 12px; margin: 10px 0 0; color: var(--muted); font-size: 12px; }
+    .badge { display: inline-flex; align-items: center; min-height: 24px; padding: 3px 9px; border-radius: 99px; background: var(--sky); color: var(--blue); font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .badge.done { background: color-mix(in srgb, var(--success) 12%, var(--card)); color: var(--success); }
+    .badge.priority { background: color-mix(in srgb, var(--gold) 25%, var(--card)); color: #705100; }
+    :root[data-theme="dark"] .badge.priority { color: #ffe59a; }
+    .card-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 15px 0; }
+    .toolbar .input { max-width: 360px; }
+    .nav-button {
+      display: flex;
+      width: 100%;
+      min-height: 47px;
+      align-items: center;
+      gap: 11px;
+      padding: 10px 12px;
+      border: 0;
+      border-radius: 11px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+    }
+    .nav-button svg { width: 19px; height: 19px; }
+    .nav-button.active { background: #eaf1ff; color: #123d86; }
+    :root[data-theme="dark"] .nav-button.active { background: #1b315c; color: #d9e7ff; }
+    .bottom-nav {
+      position: fixed;
+      z-index: 8;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: none;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      padding: 6px 4px calc(7px + env(safe-area-inset-bottom, 0px));
+      border-top: 1px solid var(--line);
+      background: var(--card);
+      box-shadow: 0 -7px 24px rgba(19,32,68,.07);
+    }
+    .bottom-nav .nav-button { min-width: 0; min-height: 52px; flex-direction: column; justify-content: center; gap: 3px; padding: 5px 1px; border-radius: 9px; font-size: 10px; }
+    .bottom-nav .nav-button svg { width: 19px; height: 19px; }
+    .group-invite { margin-top: 11px; padding: 12px; border-radius: 11px; background: var(--bg); color: var(--muted); font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .check-row { display: flex; align-items: flex-start; gap: 10px; margin: 13px 0; color: var(--muted); font-size: 13px; }
+    .check-row input { width: 18px; height: 18px; flex: 0 0 18px; margin: 1px 0 0; accent-color: var(--navy); }
+    .danger-zone { border-color: color-mix(in srgb, var(--danger) 35%, var(--line)); }
+    .toast {
+      position: fixed;
+      z-index: 30;
+      right: 16px;
+      bottom: calc(87px + env(safe-area-inset-bottom, 0px));
+      left: 16px;
+      width: fit-content;
+      max-width: min(460px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: var(--deep);
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(0,0,0,.2);
+      font-size: 13px;
+    }
+    .modal {
+      position: fixed;
+      z-index: 20;
+      inset: 0;
+      display: grid;
+      align-items: end;
+      justify-items: center;
+      padding: 0;
+      background: rgba(3,12,35,.6);
+    }
+    .modal[hidden], [hidden] { display: none !important; }
+    .modal-panel {
+      width: 100%;
+      max-height: min(90dvh, 780px);
+      overflow: auto;
+      padding: 21px 18px calc(22px + env(safe-area-inset-bottom, 0px));
+      border: 1px solid var(--line);
+      border-radius: 20px 20px 0 0;
+      background: var(--card);
+      color: var(--ink);
+      box-shadow: 0 -12px 50px rgba(0,0,0,.16);
+    }
+    .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .modal-head h2 { margin: 0; }
+    .close-button { display: grid; width: 40px; height: 40px; flex: 0 0 40px; place-items: center; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: var(--ink); font-size: 22px; cursor: pointer; }
+    .modal-form { margin-top: 5px; }
+    .page-footer { margin-top: 28px; color: var(--muted); font-size: 12px; line-height: 1.5; text-align: center; }
+    @media (min-width: 600px) {
+      main { padding: 30px 28px 56px; }
+      .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .field.wide { grid-column: 1 / -1; }
+      .stats { gap: 14px; }
+      .stat { padding: 18px; }
+      .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (min-width: 900px) {
+      body { background: #e9eef8; }
+      .app { max-width: 1440px; min-height: 100vh; margin: 0 auto; background: var(--bg); box-shadow: 0 0 60px rgba(4,20,63,.09); }
+      .top { min-height: 72px; padding: 12px 32px; }
+      .layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); align-items: start; max-width: 1280px; min-height: calc(100vh - 72px); margin: 0 auto; padding: 0 24px; }
+      .side-nav { position: sticky; top: 92px; display: block; padding: 26px 15px 24px 0; }
+      .nav-label { margin: 0 0 10px 12px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+      main { max-width: 960px; padding: 36px 36px 55px; }
+      .bottom-nav { display: none !important; }
+      .welcome { min-height: calc(100vh - 150px); }
+      .modal { align-items: center; padding: 24px; }
+      .modal-panel { width: min(600px, 100%); max-height: min(86dvh, 800px); padding: 25px; border-radius: 20px; }
+      .toast { bottom: 24px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <a class="brand" href="#" aria-label="LNK home" data-action="home">
+        <span class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
+        </span>
+        <span class="brand-name">LNK</span>
+      </a>
+      <div class="top-actions">
+        <span class="privacy-pill" title="Your information is saved in this browser only">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/></svg>
+          <span>Private on this device</span>
+        </span>
+        <button class="top-button" type="button" data-action="theme" aria-label="Toggle colour theme">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+          <span class="theme-label">Theme</span>
+        </button>
+      </div>
+    </header>
+    <div class="layout">
+      <aside class="side-nav" id="sideNav" hidden>
+        <p class="nav-label">Workspace</p>
+        <nav id="desktopNav" aria-label="Main navigation"></nav>
+      </aside>
+      <main id="main" tabindex="-1"></main>
+    </div>
+    <nav class="bottom-nav" id="mobileNav" aria-label="Main navigation"></nav>
+  </div>
+  <div class="modal" id="modal" hidden>
+    <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head">
+        <div><h2 id="modalTitle"></h2><p id="modalDescription" class="help"></p></div>
+        <button class="close-button" type="button" data-action="close-modal" aria-label="Close dialog">×</button>
+      </div>
+      <div id="modalContent"></div>
+    </section>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <script>
+    (() => {
+      "use strict";
 
-function fx(done){const ov=$("#ov"),cv=$("#fx"),c=cv.getContext("2d"),card=$("#fcard"),st=steps();
-if(matchMedia("(prefers-reduced-motion: reduce)").matches){ov.classList.add("on");$("#lm").textContent=st[1];setTimeout(()=>{ov.classList.remove("on");done()},1200);return}
-const dpr=Math.min(2,devicePixelRatio||1),W=innerWidth,H=innerHeight,r=card.getBoundingClientRect(),cx=W/2,cy=H*.42,cols=["#ffffff","#5b9bd5","#f5b800","#c5d5ff"];
-cv.width=W*dpr;cv.height=H*dpr;c.setTransform(dpr,0,0,dpr,0,0);
-const ps=Array.from({length:260},(_,i)=>({x:r.left+Math.random()*r.width,y:r.top+Math.random()*r.height,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*3-.5,r:1.4+Math.random()*2.2,col:cols[i%4],a:Math.random()*6.28,rad:20+Math.random()*100,sp:.02+Math.random()*.03}));
-ov.classList.add("on");card.classList.add("melt");const t0=performance.now();
-(function f(now){const t=(now-t0)/1000;c.clearRect(0,0,W,H);c.globalAlpha=1;const g=t<.8?0:Math.min(1,(t-.8)/1.6);
-if(g>0){const R=(18+g*26+Math.sin(t*6)*2)*2.4,gr=c.createRadialGradient(cx,cy,0,cx,cy,R);gr.addColorStop(0,"rgba(245,184,0,.9)");gr.addColorStop(.4,"rgba(91,155,213,.45)");gr.addColorStop(1,"rgba(91,155,213,0)");c.fillStyle=gr;c.beginPath();c.arc(cx,cy,R,0,7);c.fill()}
-ps.forEach(p=>{if(t<.8){p.x+=p.vx;p.y+=p.vy;p.vx*=.985}
-else if(t<3.2){const s=Math.min(1,(t-.8)/2.4),rad=p.rad*(1-s*.75)+8;p.a+=p.sp*(1+s*2);p.x+=(cx+Math.cos(p.a)*rad-p.x)*.07;p.y+=(cy+Math.sin(p.a)*rad-p.y)*.07}
-else{if(!p.b){const d=Math.atan2(p.y-cy,p.x-cx),k=4+Math.random()*8;p.b=[Math.cos(d)*k,Math.sin(d)*k]}p.x+=p.b[0];p.y+=p.b[1]}
-c.globalAlpha=t>3.2?Math.max(0,1-(t-3.2)*2.2):1;c.fillStyle=p.col;c.beginPath();c.arc(p.x,p.y,p.r,0,7);c.fill()});
-$("#lm").textContent=st[Math.min(3,Math.floor(t/.9))];
-if(t<3.7)requestAnimationFrame(f);else{ov.classList.remove("on");card.classList.remove("melt");done()}})(t0)}
+      const STORAGE_KEY = "lnk-study-planner";
+      const programmes = {
+        "Computer Science": [
+          "Introduction to Computer Science|Programming Fundamentals",
+          "Object-Oriented Programming|Discrete Mathematics",
+          "CSC 301 Data Structures|CSC 308 Operating Systems|CSC 312 Compiler Construction|CSC 317 Numerical Analysis|Machine Learning",
+          "Final Year Project"
+        ],
+        "Software Engineering": [
+          "Programming Fundamentals|Calculus",
+          "Object-Oriented Programming|Database Systems",
+          "CSC 301 Data Structures|CSC 308 Operating Systems|SEN 313 Compiler Construction|CSC 317 Numerical Analysis|SEN 322 Innovation and New Technologies",
+          "Software Project Management|Final Year Project"
+        ],
+        "Data Science": [
+          "Statistics I|Programming Fundamentals",
+          "Probability|Databases",
+          "Data Mining|Statistical Modelling",
+          "Machine Learning|Capstone Project"
+        ],
+        "Accounting": [
+          "Principles of Accounting|Business Mathematics",
+          "Financial Accounting|Cost Accounting",
+          "Auditing|Taxation",
+          "Advanced Financial Reporting|Strategic Management Accounting"
+        ],
+        "Business Administration": [
+          "Introduction to Business|Principles of Management",
+          "Marketing|Organisational Behaviour",
+          "Operations Management|Business Law",
+          "Strategic Management|Business Research Methods"
+        ],
+        "Economics": [
+          "Principles of Economics|Business Mathematics",
+          "Microeconomics|Macroeconomics",
+          "Econometrics|Development Economics",
+          "International Economics|Research Project"
+        ],
+        "Finance": [
+          "Principles of Finance|Business Mathematics",
+          "Corporate Finance|Financial Markets",
+          "Investment Analysis|Financial Modelling",
+          "Risk Management|Portfolio Management"
+        ],
+        "Mass Communication": [
+          "Introduction to Mass Communication|Writing for Media",
+          "Journalism|Public Relations",
+          "Broadcasting|Media Law and Ethics",
+          "Media Research|Final Year Project"
+        ],
+        "Information Science and Media Studies": [
+          "Introduction to Digital Media|Information Science",
+          "Web Design|Digital Storytelling",
+          "Data and Media Analytics|Digital Marketing",
+          "Media Strategy|Final Year Project"
+        ]
+      };
+      const generalCourses = [
+        "Communication in English", "Logic", "Philosophy and Human Existence",
+        "Introduction to Theology", "World Civilizations", "Peace Studies and Conflict Resolution",
+        "General Ethics", "Contemporary Health Issues", "Philosophical Anthropology", "Entrepreneurship"
+      ];
+      const navItems = [
+        { id: "home", label: "Home", icon: '<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>' },
+        { id: "requests", label: "Study requests", short: "Requests", icon: '<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>' },
+        { id: "plans", label: "Study plans", short: "Plans", icon: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>' },
+        { id: "groups", label: "Group invites", short: "Groups", icon: '<circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M16 11a3 3 0 0 0 0-6m2 9a5 5 0 0 1 3 4v1"/>' },
+        { id: "profile", label: "My profile", short: "Profile", icon: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>' }
+      ];
 
-const add=n=>{S.pts+=n};
-const A={
-go:d=>{if(d.v=="match"&&!S.F)S.F={level:S.user.level,prog:S.user.prog,course:"",want:"Both"};if(d.v=="match"){S.F.level=S.F.level||S.user.level}go(d.v)},
-mode:d=>{S.au.mode=d.v;render()},
-alv:d=>{S.au.level=+d.v;document.querySelectorAll("#alv .chip").forEach(b=>b.classList.toggle("on",b.dataset.v==d.v))},
-async signup(){const nm=$("#nm").value.trim(),em=$("#em").value.trim().toLowerCase(),pw=$("#pw").value,er=$("#er"),U=store.get("lnk_users",{});
-if(!nm||!em.includes("@"))return er.textContent="Enter your name and a valid email.";if(pw.length<6)return er.textContent="Password needs at least 6 characters.";if(U[em])return er.textContent="That email already has an account. Sign in instead.";
-U[em]={name:nm,hash:await H(pw),level:S.au.level,prog:$("#pg").value};store.set("lnk_users",U);S.user={name:nm,email:em,level:U[em].level,prog:U[em].prog};save();go("home")},
-async signin(){const em=$("#em").value.trim().toLowerCase(),U=store.get("lnk_users",{}),u=U[em];
-if(!u||u.hash!==await H($("#pw").value))return $("#er").textContent="Email or password is wrong. Check both and try again.";S.user={name:u.name,email:em,level:u.level,prog:u.prog};save();go("home")},
-lvl:d=>{S.F.level=+d.v;render()},prog:d=>{S.F.prog=d.v;render()},crs:d=>{S.F.course=d.v},want:d=>{S.F.want=d.v;render()},
-match:()=>{S.F.course=$("#cs").value;fx(()=>go("results"))},
-req:()=>{const c=$("#rq").value;S.demand[c]=(S.demand[c]||0)+1;add(2);save();toast("Help requested");render()},
-join:d=>{const i=S.groups.indexOf(d.v);if(i<0){S.groups.push(d.v);add(5)}else S.groups.splice(i,1);save();render()},
-book:d=>{S.bk={t:d.v,slot:SLOTS[0]};A.sheet()},
-sheet(){modal(`<h3 style="margin-top:0">Book ${S.bk.t}</h3><p class="mute">${esc(S.F.course)}</p>${chips(SLOTS,S.bk.slot,"slot")}<button class="btn big" data-a="confirm">Confirm booking</button>`)},
-slot:d=>{S.bk.slot=d.v;A.sheet()},
-confirm:()=>{S.sessions.unshift({t:S.bk.t,c:S.F.course,slot:S.bk.slot,st:0});add(5);save();A.close();toast("Session booked");go("sessions")},
-rate:d=>{S.ri=+d.v;modal(`<h3 style="margin-top:0">How was the session?</h3><div class="stars">${[1,2,3,4,5].map(n=>`<button data-a="star" data-v="${n}" aria-label="${n} stars">★</button>`).join("")}</div>`)},
-star:d=>{S.sessions[S.ri].st=+d.v;add(10);save();A.close();toast("Thanks, +10 points");render()},
-chat:d=>{if(!S.chats[d.v])S.chats[d.v]=[{me:0,t:"Hi! I’m "+d.v.split(" ")[0]+". What do you need help with?"}];S.th=d.v;save();go("thread")},
-send:()=>{const i=$("#mi"),t=i.value.trim(),k=S.th;if(!t)return;const m=S.chats[k];m.push({me:1,t});const R=["Sure, send me your notes and I’ll go through them.","Let’s start with the past questions.","Good plan. Book a slot and we’ll cover it.","Happy to help with that topic."];
-setTimeout(()=>{m.push({me:0,t:R[m.length%4]});save();if(S.view=="thread"&&S.th==k)render()},900);save();render()},
-close:()=>$("#md").classList.remove("on"),
-out:()=>{S.user=null;S.view="auth";S.au.mode="in";save();render()},
-reset:()=>{store.set("lnk",{});store.set("lnk_users",{});location.reload()}};
-async function H(s){try{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}catch(e){return s}}
-document.addEventListener("click",e=>{if(e.target.id=="md")return A.close();const b=e.target.closest("[data-a]");if(!b||b.tagName=="SELECT"||b.tagName=="OPTION")return;A[b.dataset.a](b.dataset)});
-document.addEventListener("change",e=>{const b=e.target.closest("select[data-a]");if(b)A[b.dataset.a]({v:b.value})});
-document.addEventListener("keydown",e=>{if(e.key=="Enter"&&e.target.id=="mi")A.send()});
-render();
-</script></body></html>
+      const emptyState = () => ({ version: 1, profile: null, requests: [], plans: [], groups: [], theme: "light" });
+      let state = emptyState();
+      let currentView = "home";
+      let toastTimer;
+      let lastDialogTrigger = null;
+      let storageWarning = "";
+
+      const $ = (selector, root = document) => root.querySelector(selector);
+      const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[char]);
+      const uid = () => (globalThis.crypto?.randomUUID?.() || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`);
+      const coursesFor = (programme, level) => [
+        ...((programmes[programme] || [])[(Number(level) / 100) - 1] || "").split("|").filter(Boolean),
+        ...generalCourses
+      ];
+      const localDate = (date = new Date()) => {
+        const adjusted = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+        return adjusted.toISOString().slice(0, 10);
+      };
+      const formatDate = (value) => {
+        if (!value) return "Date not set";
+        const date = new Date(`${value}T12:00:00`);
+        return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(date);
+      };
+      const selectOptions = (items, selected = "", firstLabel = "") =>
+        `${firstLabel ? `<option value="">${escapeHtml(firstLabel)}</option>` : ""}${items.map((item) =>
+          `<option value="${escapeHtml(item)}" ${item === selected ? "selected" : ""}>${escapeHtml(item)}</option>`
+        ).join("")}`;
+      const icon = (path) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
+
+      function loadState() {
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (!stored) return emptyState();
+          const parsed = JSON.parse(stored);
+          if (!parsed || typeof parsed !== "object" || parsed.version !== 1) throw new Error("The saved data format is not recognised.");
+          const initial = emptyState();
+          return {
+            ...initial,
+            profile: parsed.profile && typeof parsed.profile === "object" ? parsed.profile : null,
+            requests: Array.isArray(parsed.requests) ? parsed.requests : [],
+            plans: Array.isArray(parsed.plans) ? parsed.plans : [],
+            groups: Array.isArray(parsed.groups) ? parsed.groups : [],
+            theme: parsed.theme === "dark" ? "dark" : "light"
+          };
+        } catch (error) {
+          storageWarning = `Saved data could not be read: ${error.message}`;
+          return emptyState();
+        }
+      }
+
+      function commit(update) {
+        const next = structuredClone(state);
+        update(next);
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+          state = next;
+          storageWarning = "";
+          return true;
+        } catch (error) {
+          showToast(`Could not save your change on this device: ${error.message}`);
+          return false;
+        }
+      }
+
+      function showToast(message) {
+        const toast = $("#toast");
+        toast.textContent = message;
+        toast.hidden = false;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { toast.hidden = true; }, 3500);
+      }
+
+      function setTheme() {
+        document.documentElement.dataset.theme = state.theme;
+        const label = $(".theme-label");
+        if (label) label.textContent = state.theme === "dark" ? "Dark" : "Light";
+      }
+
+      function renderNav() {
+        const signedIn = Boolean(state.profile);
+        $("#sideNav").hidden = !signedIn;
+        if (!signedIn) {
+          $("#desktopNav").innerHTML = "";
+          $("#mobileNav").style.display = "none";
+          return;
+        }
+        const markup = (mobile) => navItems.map((item) => {
+          const text = mobile ? (item.short || item.label) : item.label;
+          return `<button class="nav-button ${currentView === item.id ? "active" : ""}" type="button" data-action="navigate" data-view="${item.id}" ${currentView === item.id ? 'aria-current="page"' : ""}>${icon(item.icon)}<span>${text}</span></button>`;
+        }).join("");
+        $("#desktopNav").innerHTML = markup(false);
+        $("#mobileNav").innerHTML = markup(true);
+        $("#mobileNav").style.display = "grid";
+      }
+
+      function workspaceNotice() {
+        return `<div class="privacy-note">${icon('<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/>')}<div><strong>Private study workspace.</strong> Your profile, requests and plans are saved in this browser on this device. Nothing is sent to tutors or other students. This is not a school account or cloud backup; avoid storing sensitive information.</div></div>`;
+      }
+
+      function profileForm(isEditing = false) {
+        const profile = state.profile || { name: "", programme: "Computer Science", level: "100" };
+        return `<form class="card" data-form="profile">
+          <h2>${isEditing ? "Update your study profile" : "Set up your study planner"}</h2>
+          <p class="muted">${isEditing ? "Change your local profile at any time." : "Choose your programme and level so your course list is relevant to you."}</p>
+          <div class="form-grid">
+            <div class="field wide"><label for="profileName">Your name</label><input class="input" id="profileName" name="name" maxlength="70" autocomplete="name" placeholder="e.g. Alex" value="${escapeHtml(profile.name)}" required></div>
+            <div class="field"><label for="profileProgramme">Programme</label><select class="input" id="profileProgramme" name="programme" required>${selectOptions(Object.keys(programmes), profile.programme)}</select></div>
+            <div class="field"><label for="profileLevel">Study level</label><select class="input" id="profileLevel" name="level" required>${selectOptions(["100", "200", "300", "400"], String(profile.level))}</select></div>
+          </div>
+          <button class="button full" type="submit">${isEditing ? "Save profile" : "Create my local profile"}</button>
+          ${isEditing ? "" : '<p class="help" style="text-align:center;margin:12px 0 0">No password or account required. Your profile stays in this browser.</p>'}
+        </form>`;
+      }
+
+      function renderWelcome() {
+        return `<section class="welcome">
+          <p class="eyebrow">Your study space</p>
+          <h1>Make a little more room for learning.</h1>
+          <p class="intro">Organise courses you want help with, plan study sessions and prepare invitations for a study group. Keep your study plans in one simple place.</p>
+          ${storageWarning ? `<p class="privacy-note" role="alert">${escapeHtml(storageWarning)}</p>` : ""}
+          ${workspaceNotice()}
+          ${profileForm()}
+          <p class="page-footer">LNK is a personal organiser. It does not create accounts, find real tutors or send your requests to other students.</p>
+        </section>`;
+      }
+
+      function priorityBadge(priority) {
+        return priority === "Soon" ? '<span class="badge priority">Help soon</span>' : "";
+      }
+
+      function requestCard(request) {
+        const done = request.status === "done";
+        return `<article class="card" data-searchable="${escapeHtml(`${request.course} ${request.topic} ${request.details || ""}`.toLowerCase())}">
+          <div class="request-head"><div><p class="request-course">${escapeHtml(request.course)}</p><h3 class="request-title">${escapeHtml(request.topic)}</h3></div><div class="button-row"><span class="badge ${done ? "done" : ""}">${done ? "Completed" : "To do"}</span>${priorityBadge(request.priority)}</div></div>
+          ${request.details ? `<p class="request-details">${escapeHtml(request.details)}</p>` : ""}
+          <div class="meta"><span>Added ${formatDate(request.createdAt)}</span></div>
+          <div class="card-actions">
+            <button class="button secondary small" type="button" data-action="toggle-request" data-id="${escapeHtml(request.id)}">${done ? "Reopen" : "Mark complete"}</button>
+            <button class="button secondary small" type="button" data-action="edit-request" data-id="${escapeHtml(request.id)}">Edit</button>
+            <button class="button secondary small" type="button" data-action="plan-from-request" data-id="${escapeHtml(request.id)}">Plan a study session</button>
+            <button class="button danger small" type="button" data-action="delete-request" data-id="${escapeHtml(request.id)}">Delete</button>
+          </div>
+        </article>`;
+      }
+
+      function planCard(plan) {
+        return `<article class="card" data-searchable="${escapeHtml(`${plan.course} ${plan.topic} ${plan.notes || ""}`.toLowerCase())}">
+          <div class="item-head"><div><p class="request-course">${escapeHtml(plan.course)}</p><h3>${escapeHtml(plan.topic)}</h3></div><span class="badge">${plan.status === "done" ? "Completed" : "Planned"}</span></div>
+          <p class="meta"><span>${formatDate(plan.date)}</span><span>${escapeHtml(plan.time)}</span></p>
+          ${plan.notes ? `<p class="request-details">${escapeHtml(plan.notes)}</p>` : ""}
+          <div class="card-actions">
+            <button class="button secondary small" type="button" data-action="toggle-plan" data-id="${escapeHtml(plan.id)}">${plan.status === "done" ? "Reopen plan" : "Mark complete"}</button>
+            <button class="button secondary small" type="button" data-action="edit-plan" data-id="${escapeHtml(plan.id)}">Edit</button>
+            <button class="button danger small" type="button" data-action="delete-plan" data-id="${escapeHtml(plan.id)}">Delete</button>
+          </div>
+        </article>`;
+      }
+
+      function groupInvite(group) {
+        const when = group.date ? ` on ${formatDate(group.date)}${group.time ? ` at ${group.time}` : ""}` : "";
+        return `Study group: ${group.name}\nCourse: ${group.course}${when}\n${group.details || "Let’s study together."}\n\nPlease contact me directly if you’d like to join.`;
+      }
+
+      function groupCard(group) {
+        return `<article class="card" data-searchable="${escapeHtml(`${group.name} ${group.course} ${group.details || ""}`.toLowerCase())}">
+          <div class="item-head"><div><p class="request-course">${escapeHtml(group.course)}</p><h3>${escapeHtml(group.name)}</h3></div><span class="badge">Invitation draft</span></div>
+          ${group.date ? `<p class="meta"><span>${formatDate(group.date)}${group.time ? ` · ${escapeHtml(group.time)}` : ""}</span></p>` : ""}
+          ${group.details ? `<p class="request-details">${escapeHtml(group.details)}</p>` : ""}
+          <p class="help">This draft is private. Share it yourself to invite classmates; it does not create a real group or notify anyone.</p>
+          <div class="card-actions">
+            <button class="button small" type="button" data-action="share-group" data-id="${escapeHtml(group.id)}">Share invitation</button>
+            <button class="button secondary small" type="button" data-action="edit-group" data-id="${escapeHtml(group.id)}">Edit</button>
+            <button class="button danger small" type="button" data-action="delete-group" data-id="${escapeHtml(group.id)}">Delete</button>
+          </div>
+        </article>`;
+      }
+
+      function sectionEmpty(title, description, action, label) {
+        return `<div class="empty"><h3>${title}</h3><p>${description}</p>${action ? `<button class="button small" type="button" data-action="${action}">${label}</button>` : ""}</div>`;
+      }
+
+      function renderHome() {
+        const openRequests = state.requests.filter((item) => item.status !== "done").length;
+        const upcoming = state.plans.filter((item) => item.status !== "done").length;
+        const profile = state.profile;
+        return `<p class="eyebrow">Your workspace</p>
+          <h1>Welcome back, ${escapeHtml(profile.name.split(/\s+/)[0])}.</h1>
+          <p class="muted">Level ${escapeHtml(profile.level)} · ${escapeHtml(profile.programme)}</p>
+          ${storageWarning ? `<p class="privacy-note" role="alert">${escapeHtml(storageWarning)}</p>` : ""}
+          ${workspaceNotice()}
+          <section class="hero"><h2>What would you like to work on?</h2><p>Add a topic you need help with, set a time to study, or draft an invitation to share with classmates.</p><div class="button-row"><button class="button" type="button" data-action="add-request">Add a study request</button><button class="button secondary" type="button" data-action="add-plan">Plan a session</button></div></section>
+          <div class="stats"><div class="stat"><strong>${openRequests}</strong><span>Open study requests</span></div><div class="stat"><strong>${upcoming}</strong><span>Planned sessions</span></div><div class="stat"><strong>${state.groups.length}</strong><span>Invitation drafts</span></div></div>
+          <div class="section-heading"><h2>Study requests</h2><button class="button secondary small" type="button" data-action="navigate" data-view="requests">View all</button></div>
+          ${openRequests ? state.requests.filter((item) => item.status !== "done").slice(0, 3).map(requestCard).join("") : sectionEmpty("Nothing to chase yet", "Add a course and topic to keep track of what you want to understand.", "add-request", "Add a study request")}
+          <div class="section-heading"><h2>Next study sessions</h2><button class="button secondary small" type="button" data-action="navigate" data-view="plans">View plans</button></div>
+          ${upcoming ? state.plans.filter((item) => item.status !== "done").slice().sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`)).slice(0, 2).map(planCard).join("") : sectionEmpty("No sessions planned", "Choose a course and set aside time for it.", "add-plan", "Plan a study session")}
+          <p class="page-footer">LNK keeps your planner on this device. It does not connect you to tutors or send messages.</p>`;
+      }
+
+      function renderRequests() {
+        const open = state.requests.filter((item) => item.status !== "done");
+        const done = state.requests.filter((item) => item.status === "done");
+        const list = [...open, ...done];
+        return `<p class="eyebrow">Keep track</p><h1>Study requests</h1>
+          <p class="intro">A study request is a private reminder of a course or topic you want help with. It is saved here for you; it is not sent to a tutor, teacher or other student.</p>
+          <div class="toolbar"><input class="input" type="search" data-search placeholder="Search your requests" aria-label="Search your study requests"><button class="button" type="button" data-action="add-request">Add request</button></div>
+          ${list.length ? list.map(requestCard).join("") : sectionEmpty("No requests yet", "Save a course and a topic you want to focus on.", "add-request", "Add your first request")}
+          ${list.length ? '<div class="empty" id="searchEmpty" hidden><h3>No matching requests</h3><p>Try another course or topic.</p></div>' : ""}
+          ${storageWarning ? `<p class="help" role="alert">${escapeHtml(storageWarning)}</p>` : ""}`;
+      }
+
+      function renderPlans() {
+        const sorted = state.plans.slice().sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
+        return `<p class="eyebrow">Make time for it</p><h1>Study plans</h1>
+          <p class="intro">Set a time and focus for your next study session. Plans are private reminders on this device, not calendar invitations.</p>
+          <div class="toolbar"><span class="muted">${state.plans.filter((plan) => plan.status !== "done").length} planned</span><button class="button" type="button" data-action="add-plan">Plan a session</button></div>
+          ${sorted.length ? sorted.map(planCard).join("") : sectionEmpty("No study sessions planned", "Pick a course and reserve a little time to work on it.", "add-plan", "Plan a session")}`;
+      }
+
+      function renderGroups() {
+        return `<p class="eyebrow">Bring people together</p><h1>Group invitations</h1>
+          <p class="intro">Create an invitation draft for a study group, then share it yourself by text, email or another app. LNK does not publish groups, find members or send invitations.</p>
+          <div class="toolbar"><span class="muted">${state.groups.length} invitation${state.groups.length === 1 ? "" : "s"}</span><button class="button" type="button" data-action="add-group">Create invitation</button></div>
+          ${state.groups.length ? state.groups.slice().reverse().map(groupCard).join("") : sectionEmpty("No invitations yet", "Make a course-specific invitation you can share with people you already know.", "add-group", "Create an invitation")}`;
+      }
+
+      function renderProfile() {
+        return `<p class="eyebrow">Your details</p><h1>My profile</h1>
+          <p class="intro">This profile helps LNK show relevant courses. It is stored locally in this browser and is not connected to a school account.</p>
+          ${profileForm(true)}
+          <section class="card"><h2>Your data</h2><p class="muted">Export a backup of your profile, study requests, session plans and invitation drafts, or erase this browser’s LNK data.</p>
+            <div class="button-row"><button class="button secondary" type="button" data-action="export">Export my data</button><button class="button danger" type="button" data-action="erase">Erase my data</button></div>
+          </section>
+          <section class="card"><h2>What LNK does</h2><p class="muted">Organises your study requests, plans and invitation drafts on this device. It does not create a secure login, match real tutors, send help requests, message classmates, or synchronise data between devices.</p></section>`;
+      }
+
+      function render() {
+        setTheme();
+        renderNav();
+        const main = $("#main");
+        if (!state.profile) {
+          currentView = "welcome";
+          main.innerHTML = renderWelcome();
+          return;
+        }
+        const pages = { home: renderHome, requests: renderRequests, plans: renderPlans, groups: renderGroups, profile: renderProfile };
+        if (!pages[currentView]) currentView = "home";
+        main.innerHTML = pages[currentView]();
+      }
+
+      function showModal(title, description, content) {
+        lastDialogTrigger = document.activeElement;
+        $("#modalTitle").textContent = title;
+        $("#modalDescription").textContent = description;
+        $("#modalContent").innerHTML = content;
+        $("#modal").hidden = false;
+        document.body.style.overflow = "hidden";
+        requestAnimationFrame(() => $("#modalPanelFocus")?.focus() || $("#modalContent input, #modalContent select, #modalContent textarea, #modalContent button")?.focus());
+      }
+
+      function closeModal() {
+        $("#modal").hidden = true;
+        document.body.style.overflow = "";
+        lastDialogTrigger?.focus?.();
+      }
+
+      function requestForm(request = null) {
+        const courses = coursesFor(state.profile.programme, state.profile.level);
+        if (request && !courses.includes(request.course)) courses.unshift(request.course);
+        const editing = Boolean(request);
+        return `<form class="modal-form" data-form="request" data-id="${escapeHtml(request?.id || "")}">
+          <div class="field"><label for="requestCourse">Course</label><select class="input" id="requestCourse" name="course" required>${selectOptions(courses, request?.course || "", "Choose a course")}</select></div>
+          <div class="field"><label for="requestTopic">What do you want help understanding?</label><input class="input" id="requestTopic" name="topic" maxlength="100" placeholder="e.g. Linked lists or exam revision" value="${escapeHtml(request?.topic || "")}" required></div>
+          <div class="field"><label for="requestDetails">Notes <span class="muted">(optional)</span></label><textarea class="input" id="requestDetails" name="details" maxlength="500" placeholder="Add a question, chapter or detail to remember">${escapeHtml(request?.details || "")}</textarea></div>
+          <label class="check-row"><input type="checkbox" name="priority" ${request?.priority === "Soon" ? "checked" : ""}><span>Mark this as something I want to work on soon</span></label>
+          <p class="help">This saves a private reminder on this device. It does not contact anyone.</p>
+          <button class="button full" type="submit">${editing ? "Save changes" : "Save study request"}</button>
+        </form>`;
+      }
+
+      function planForm(plan = null, request = null) {
+        const courses = coursesFor(state.profile.programme, state.profile.level);
+        const selectedCourse = plan?.course || request?.course;
+        if (selectedCourse && !courses.includes(selectedCourse)) courses.unshift(selectedCourse);
+        return `<form class="modal-form" data-form="plan" data-id="${escapeHtml(plan?.id || "")}">
+          <div class="field"><label for="planCourse">Course</label><select class="input" id="planCourse" name="course" required>${selectOptions(courses, plan?.course || request?.course || "", "Choose a course")}</select></div>
+          <div class="field"><label for="planTopic">What will you focus on?</label><input class="input" id="planTopic" name="topic" maxlength="100" placeholder="e.g. Review lecture notes" value="${escapeHtml(plan?.topic || request?.topic || "")}" required></div>
+          <div class="form-grid">
+            <div class="field"><label for="planDate">Date</label><input class="input" id="planDate" name="date" type="date" min="${localDate()}" value="${escapeHtml(plan?.date || localDate())}" required></div>
+            <div class="field"><label for="planTime">Start time</label><input class="input" id="planTime" name="time" type="time" value="${escapeHtml(plan?.time || "16:00")}" required></div>
+          </div>
+          <div class="field"><label for="planNotes">Notes <span class="muted">(optional)</span></label><textarea class="input" id="planNotes" name="notes" maxlength="500" placeholder="What should you prepare?">${escapeHtml(plan?.notes || "")}</textarea></div>
+          <button class="button full" type="submit">${plan ? "Save changes" : "Save study plan"}</button>
+        </form>`;
+      }
+
+      function groupForm(group = null) {
+        const courses = coursesFor(state.profile.programme, state.profile.level);
+        if (group && !courses.includes(group.course)) courses.unshift(group.course);
+        return `<form class="modal-form" data-form="group" data-id="${escapeHtml(group?.id || "")}">
+          <div class="field"><label for="groupName">Invitation title</label><input class="input" id="groupName" name="name" maxlength="80" placeholder="e.g. CSC 301 revision" value="${escapeHtml(group?.name || "")}" required></div>
+          <div class="field"><label for="groupCourse">Course</label><select class="input" id="groupCourse" name="course" required>${selectOptions(courses, group?.course || "", "Choose a course")}</select></div>
+          <div class="form-grid">
+            <div class="field"><label for="groupDate">Suggested date <span class="muted">(optional)</span></label><input class="input" id="groupDate" name="date" type="date" min="${localDate()}" value="${escapeHtml(group?.date || "")}"></div>
+            <div class="field"><label for="groupTime">Suggested time <span class="muted">(optional)</span></label><input class="input" id="groupTime" name="time" type="time" value="${escapeHtml(group?.time || "")}"></div>
+          </div>
+          <div class="field"><label for="groupDetails">Invitation note <span class="muted">(optional)</span></label><textarea class="input" id="groupDetails" name="details" maxlength="300" placeholder="What would you like the group to cover?">${escapeHtml(group?.details || "")}</textarea></div>
+          <p class="help">This creates a message you can share yourself. No group is published and no one is contacted.</p>
+          <button class="button full" type="submit">${group ? "Save invitation changes" : "Save invitation draft"}</button>
+        </form>`;
+      }
+
+      function navigate(view) {
+        closeModal();
+        currentView = view;
+        render();
+        $("#main").focus({ preventScroll: true });
+        window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+      }
+
+      function handleProfile(form) {
+        const data = new FormData(form);
+        const name = String(data.get("name") || "").trim();
+        const programme = String(data.get("programme") || "");
+        const level = Number(data.get("level"));
+        if (!name || name.length > 70 || !programmes[programme] || ![100, 200, 300, 400].includes(level)) {
+          showToast("Please enter a name, programme and study level.");
+          return;
+        }
+        if (commit((next) => {
+          next.profile = { name, programme, level };
+        })) {
+          currentView = "home";
+          render();
+          showToast("Your local study profile is saved.");
+        }
+      }
+
+      function handleRequest(form) {
+        const data = new FormData(form);
+        const course = String(data.get("course") || "");
+        const topic = String(data.get("topic") || "").trim();
+        const details = String(data.get("details") || "").trim();
+        const id = form.dataset.id;
+        if (!coursesFor(state.profile.programme, state.profile.level).includes(course) || !topic || topic.length > 100 || details.length > 500) {
+          showToast("Choose a course and enter a short topic.");
+          return;
+        }
+        const existing = state.requests.find((item) => item.id === id);
+        const request = {
+          id: existing?.id || uid(),
+          course,
+          topic,
+          details,
+          priority: data.has("priority") ? "Soon" : "Anytime",
+          status: existing?.status || "open",
+          createdAt: existing?.createdAt || localDate()
+        };
+        if (commit((next) => {
+          if (existing) next.requests = next.requests.map((item) => item.id === id ? request : item);
+          else next.requests.unshift(request);
+        })) {
+          closeModal();
+          render();
+          showToast(existing ? "Study request updated." : "Study request saved on this device.");
+        }
+      }
+
+      function handlePlan(form) {
+        const data = new FormData(form);
+        const course = String(data.get("course") || "");
+        const topic = String(data.get("topic") || "").trim();
+        const date = String(data.get("date") || "");
+        const time = String(data.get("time") || "");
+        const notes = String(data.get("notes") || "").trim();
+        const id = form.dataset.id;
+        if (!coursesFor(state.profile.programme, state.profile.level).includes(course) || !topic || !date || !time || notes.length > 500) {
+          showToast("Choose a course, focus, date and time for your plan.");
+          return;
+        }
+        if (date < localDate()) {
+          showToast("Choose today or a future date.");
+          return;
+        }
+        const existing = state.plans.find((item) => item.id === id);
+        const plan = { id: existing?.id || uid(), course, topic, date, time, notes, status: existing?.status || "open" };
+        if (commit((next) => {
+          if (existing) next.plans = next.plans.map((item) => item.id === id ? plan : item);
+          else next.plans.unshift(plan);
+        })) {
+          closeModal();
+          render();
+          showToast(existing ? "Study plan updated." : "Study session planned.");
+        }
+      }
+
+      function handleGroup(form) {
+        const data = new FormData(form);
+        const name = String(data.get("name") || "").trim();
+        const course = String(data.get("course") || "");
+        const date = String(data.get("date") || "");
+        const time = String(data.get("time") || "");
+        const details = String(data.get("details") || "").trim();
+        const id = form.dataset.id;
+        if (!name || name.length > 80 || !coursesFor(state.profile.programme, state.profile.level).includes(course) || details.length > 300) {
+          showToast("Add an invitation title and choose a course.");
+          return;
+        }
+        if (date && date < localDate()) {
+          showToast("Choose today or a future date.");
+          return;
+        }
+        const existing = state.groups.find((item) => item.id === id);
+        const group = { id: existing?.id || uid(), name, course, date, time, details };
+        if (commit((next) => {
+          if (existing) next.groups = next.groups.map((item) => item.id === id ? group : item);
+          else next.groups.push(group);
+        })) {
+          closeModal();
+          render();
+          showToast(existing ? "Invitation draft updated." : "Invitation draft saved. Share it when you’re ready.");
+        }
+      }
+
+      async function shareGroup(id) {
+        const group = state.groups.find((item) => item.id === id);
+        if (!group) return;
+        const text = groupInvite(group);
+        if (navigator.share) {
+          try {
+            await navigator.share({ title: group.name, text });
+            return;
+          } catch (error) {
+            if (error.name === "AbortError") return;
+          }
+        }
+        try {
+          await navigator.clipboard.writeText(text);
+          showToast("Invitation copied. Paste it into a message to your classmates.");
+        } catch {
+          showModal("Copy your invitation", "Select and copy this text, then share it using your preferred messaging app.", `<div class="field"><label for="shareText">Invitation text</label><textarea class="input" id="shareText" readonly>${escapeHtml(text)}</textarea></div><button class="button full" type="button" data-action="copy-invite" data-id="${escapeHtml(id)}">Try copy again</button>`);
+          $("#shareText").focus();
+          $("#shareText").select();
+        }
+      }
+
+      function exportData() {
+        const backup = { app: "LNK study planner", version: state.version, exportedAt: new Date().toISOString(), data: state };
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `lnk-study-planner-${localDate()}.json`;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast("Your data backup was downloaded.");
+      }
+
+      async function copyInvite(id) {
+        const group = state.groups.find((item) => item.id === id);
+        if (!group) return;
+        try {
+          await navigator.clipboard.writeText(groupInvite(group));
+          closeModal();
+          showToast("Invitation copied.");
+        } catch {
+          $("#shareText")?.select();
+          showToast("Copy is unavailable here. Select the text and copy it manually.");
+        }
+      }
+
+      function handleAction(button) {
+        const action = button.dataset.action;
+        const id = button.dataset.id;
+        if (action === "home") return navigate(state.profile ? "home" : "welcome");
+        if (action === "navigate") return navigate(button.dataset.view);
+        if (action === "close-modal") return closeModal();
+        if (action === "theme") {
+          if (commit((next) => { next.theme = next.theme === "dark" ? "light" : "dark"; })) {
+            render();
+            showToast(`${state.theme === "dark" ? "Dark" : "Light"} theme enabled.`);
+          }
+          return;
+        }
+        if (action === "add-request") return showModal("Add a study request", "Save a course topic you want to understand. This does not send a request to anyone.", requestForm());
+        if (action === "add-plan") return showModal("Plan a study session", "Set a private reminder for your own study time.", planForm());
+        if (action === "add-group") return showModal("Create a group invitation", "Prepare a message you can choose to share with classmates.", groupForm());
+        if (action === "export") return exportData();
+        if (action === "erase") {
+          if (!confirm("Erase your LNK profile, requests, plans and invitation drafts from this browser? This cannot be undone. Export a backup first if you need one.")) return;
+          try {
+            localStorage.removeItem(STORAGE_KEY);
+            state = emptyState();
+            currentView = "welcome";
+            render();
+            showToast("Your LNK data was erased from this browser.");
+          } catch (error) {
+            showToast(`Could not erase local data: ${error.message}`);
+          }
+          return;
+        }
+        if (action === "toggle-request") {
+          const item = state.requests.find((request) => request.id === id);
+          if (!item) return;
+          if (commit((next) => { next.requests = next.requests.map((request) => request.id === id ? { ...request, status: request.status === "done" ? "open" : "done" } : request); })) render();
+          return;
+        }
+        if (action === "delete-request") {
+          if (!confirm("Delete this study request?")) return;
+          if (commit((next) => { next.requests = next.requests.filter((request) => request.id !== id); })) render();
+          return;
+        }
+        if (action === "edit-request") {
+          const request = state.requests.find((item) => item.id === id);
+          if (request) showModal("Edit study request", "Update this private reminder.", requestForm(request));
+          return;
+        }
+        if (action === "plan-from-request") {
+          const request = state.requests.find((item) => item.id === id);
+          if (request) showModal("Plan a study session", "Turn this request into a private study reminder.", planForm(null, request));
+          return;
+        }
+        if (action === "toggle-plan") {
+          if (commit((next) => { next.plans = next.plans.map((plan) => plan.id === id ? { ...plan, status: plan.status === "done" ? "open" : "done" } : plan); })) render();
+          return;
+        }
+        if (action === "delete-plan") {
+          if (!confirm("Delete this study plan?")) return;
+          if (commit((next) => { next.plans = next.plans.filter((plan) => plan.id !== id); })) render();
+          return;
+        }
+        if (action === "edit-plan") {
+          const plan = state.plans.find((item) => item.id === id);
+          if (plan) showModal("Edit study plan", "Update this private study reminder.", planForm(plan));
+          return;
+        }
+        if (action === "share-group") return shareGroup(id);
+        if (action === "copy-invite") return copyInvite(id);
+        if (action === "edit-group") {
+          const group = state.groups.find((item) => item.id === id);
+          if (group) showModal("Edit invitation draft", "Update the invitation before sharing it.", groupForm(group));
+          return;
+        }
+        if (action === "delete-group") {
+          if (!confirm("Delete this invitation draft?")) return;
+          if (commit((next) => { next.groups = next.groups.filter((group) => group.id !== id); })) render();
+        }
+      }
+
+      document.addEventListener("click", (event) => {
+        if (!(event.target instanceof Element)) return;
+        const button = event.target.closest("[data-action]");
+        if (button) handleAction(button);
+        else if (event.target === $("#modal")) closeModal();
+      });
+
+      document.addEventListener("submit", (event) => {
+        const form = event.target;
+        if (!(form instanceof HTMLFormElement)) return;
+        event.preventDefault();
+        if (form.dataset.form === "profile") handleProfile(form);
+        if (form.dataset.form === "request") handleRequest(form);
+        if (form.dataset.form === "plan") handlePlan(form);
+        if (form.dataset.form === "group") handleGroup(form);
+      });
+
+      document.addEventListener("input", (event) => {
+        const search = event.target;
+        if (!(search instanceof HTMLInputElement) || !search.matches("[data-search]")) return;
+        const query = search.value.trim().toLocaleLowerCase();
+        let visible = 0;
+        document.querySelectorAll("[data-searchable]").forEach((item) => {
+          item.hidden = !item.dataset.searchable.includes(query);
+          if (!item.hidden) visible += 1;
+        });
+        const empty = $("#searchEmpty");
+        if (empty) empty.hidden = !query || visible > 0;
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !$("#modal").hidden) closeModal();
+        if (event.key === "Tab" && !$("#modal").hidden) {
+          const focusable = [...$("#modal").querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')];
+          if (!focusable.length) return;
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        }
+      });
+
+      state = loadState();
+      render();
+    })();
+  </script>
+</body>
+</html>

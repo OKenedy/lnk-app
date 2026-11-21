@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b2a6b">
-  <meta name="description" content="A private study planner for organising courses, study requests and sessions.">
-  <title>LNK — Study planner</title>
+  <meta name="description" content="LNK connects mentees and mentors through consent-based profile links and direct email introductions.">
+  <title>LNK — Mentor matching</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&display=swap">
@@ -151,7 +151,18 @@
     .button.small { min-height: 38px; padding: 8px 11px; font-size: 13px; }
     .button.full { width: 100%; }
     .button-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .role-options { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .role-option { display: flex; min-width: 0; align-items: flex-start; gap: 11px; padding: 14px; border: 1px solid var(--line); border-radius: 13px; background: var(--card); cursor: pointer; }
+    .role-option.selected { border-color: var(--blue); background: var(--sky); box-shadow: inset 0 0 0 1px var(--blue); }
+    .role-option input { width: 18px; height: 18px; flex: 0 0 18px; margin: 2px 0 0; accent-color: var(--navy); }
+    .role-option .role-icon { display: grid; width: 36px; height: 36px; flex: 0 0 36px; place-items: center; border-radius: 10px; background: var(--bg); color: var(--blue); }
+    .role-option .role-icon svg { width: 20px; height: 20px; }
+    .role-option strong, .role-option small { display: block; }
+    .role-option small { margin-top: 3px; color: var(--muted); font-size: 12px; line-height: 1.4; }
     .field { display: grid; gap: 6px; margin: 14px 0; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; clip-path: inset(50%); }
+    fieldset.field { min-width: 0; padding: 0; border: 0; }
+    fieldset.field legend { margin-bottom: 8px; font-size: 13px; font-weight: 700; }
     .field label { font-size: 13px; font-weight: 700; }
     .field small, .help { color: var(--muted); font-size: 12px; line-height: 1.5; }
     .input {
@@ -171,6 +182,17 @@
     .request-title { margin: 0; font-size: 17px; overflow-wrap: anywhere; }
     .request-details { margin: 10px 0; color: var(--muted); font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
     .meta { display: flex; flex-wrap: wrap; gap: 7px 12px; margin: 10px 0 0; color: var(--muted); font-size: 12px; }
+    .match-banner { margin: 15px 0; padding: 16px; border: 1px solid #aac7f2; border-radius: 14px; background: var(--sky); color: var(--ink); }
+    .match-banner p { margin: 5px 0 0; color: var(--muted); font-size: 14px; }
+    .mentor-card { overflow: hidden; }
+    .mentor-avatar { display: grid; width: 48px; height: 48px; flex: 0 0 48px; place-items: center; border-radius: 15px; background: var(--navy); color: #fff; font-size: 19px; font-weight: 800; }
+    .mentor-subjects { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0; }
+    .subject-chip { padding: 6px 10px; border-radius: 99px; background: var(--sky); color: var(--blue); font-size: 12px; font-weight: 700; }
+    .share-box { overflow-wrap: anywhere; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--muted); font-size: 12px; }
+    .availability-list { display: grid; grid-template-columns: 1fr; gap: 9px; margin-top: 12px; }
+    .availability-item { display: flex; align-items: flex-start; gap: 9px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 11px; background: var(--card); font-size: 13px; }
+    .availability-item strong { display: block; }
+    .availability-item span { color: var(--muted); }
     .badge { display: inline-flex; align-items: center; min-height: 24px; padding: 3px 9px; border-radius: 99px; background: var(--sky); color: var(--blue); font-size: 11px; font-weight: 800; white-space: nowrap; }
     .badge.done { background: color-mix(in srgb, var(--success) 12%, var(--card)); color: var(--success); }
     .badge.priority { background: color-mix(in srgb, var(--gold) 25%, var(--card)); color: #705100; }
@@ -265,6 +287,7 @@
       .stats { gap: 14px; }
       .stat { padding: 18px; }
       .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .role-options, .availability-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (min-width: 900px) {
       body { background: #e9eef8; }
@@ -390,20 +413,31 @@
         "Introduction to Theology", "World Civilizations", "Peace Studies and Conflict Resolution",
         "General Ethics", "Contemporary Health Issues", "Philosophical Anthropology", "Entrepreneurship"
       ];
-      const navItems = [
-        { id: "home", label: "Home", icon: '<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>' },
-        { id: "requests", label: "Study requests", short: "Requests", icon: '<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>' },
-        { id: "plans", label: "Study plans", short: "Plans", icon: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>' },
-        { id: "groups", label: "Group invites", short: "Groups", icon: '<circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M16 11a3 3 0 0 0 0-6m2 9a5 5 0 0 1 3 4v1"/>' },
-        { id: "profile", label: "My profile", short: "Profile", icon: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>' }
-      ];
+      const navItems = {
+        mentee: [
+          { id: "home", label: "Home", icon: '<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>' },
+          { id: "matches", label: "Find a mentor", short: "Mentors", icon: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M11 8v6m-3-3h6"/>' },
+          { id: "requests", label: "Study requests", short: "Requests", icon: '<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>' },
+          { id: "plans", label: "Study plans", short: "Plans", icon: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>' },
+          { id: "profile", label: "My profile", short: "Profile", icon: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>' }
+        ],
+        mentor: [
+          { id: "home", label: "Home", icon: '<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>' },
+          { id: "mentor", label: "My mentor profile", short: "Mentor card", icon: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>' },
+          { id: "plans", label: "Study plans", short: "Plans", icon: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>' },
+          { id: "groups", label: "Group invitations", short: "Groups", icon: '<circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M16 11a3 3 0 0 0 0-6m2 9a5 5 0 0 1 3 4v1"/>' },
+          { id: "profile", label: "My profile", short: "Profile", icon: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>' }
+        ]
+      };
 
-      const emptyState = () => ({ version: 1, profile: null, requests: [], plans: [], groups: [], theme: "light" });
+      const emptyState = () => ({ version: 1, profile: null, requests: [], plans: [], groups: [], connections: [], theme: "light" });
       let state = emptyState();
       let currentView = "home";
       let toastTimer;
       let lastDialogTrigger = null;
       let storageWarning = "";
+      let matchQuery = "";
+      let matchRequest = false;
 
       const $ = (selector, root = document) => root.querySelector(selector);
       const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -428,6 +462,47 @@
           `<option value="${escapeHtml(item)}" ${item === selected ? "selected" : ""}>${escapeHtml(item)}</option>`
         ).join("")}`;
       const icon = (path) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
+      const meaningfulTerms = (value) => value.toLowerCase().split(/\s+/)
+        .filter((term) => term.length > 2 && !["introduction", "fundamentals", "principles", "and", "the", "for", "with"].includes(term));
+      const encodeShare = (value) => {
+        const bytes = new TextEncoder().encode(JSON.stringify(value));
+        let binary = "";
+        bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+        return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+      };
+
+      function decodeSharedMentor(encoded) {
+        if (!encoded || encoded.length > 7000) return null;
+        try {
+          const base64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
+          const binary = atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, "="));
+          const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+          const value = JSON.parse(new TextDecoder().decode(bytes));
+          const email = String(value.email || "").trim();
+          const subjects = Array.isArray(value.subjects)
+            ? [...new Set(value.subjects.filter((item) => typeof item === "string").map((item) => item.trim().slice(0, 80)).filter(Boolean))].slice(0, 20)
+            : [];
+          if (value.type !== "lnk-mentor" || typeof value.name !== "string" || !value.name.trim()
+            || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || subjects.length === 0) return null;
+          return {
+            id: `shared-${email.toLowerCase()}`,
+            name: value.name.trim().slice(0, 70),
+            email,
+            programme: String(value.programme || "").slice(0, 80),
+            level: [100, 200, 300, 400].includes(Number(value.level)) ? Number(value.level) : 100,
+            subjects: subjects.map((item) => item.slice(0, 80)),
+            bio: String(value.bio || "").slice(0, 500),
+            availability: String(value.availability || "").slice(0, 200),
+            format: ["Online", "In person", "Online or in person"].includes(value.format) ? value.format : "Ask me",
+            rate: String(value.rate || "").slice(0, 40),
+            sharedAt: new Date().toISOString()
+          };
+        } catch {
+          return null;
+        }
+      }
+
+      const incomingMentor = decodeSharedMentor(new URLSearchParams(location.hash.slice(1)).get("mentor"));
 
       function loadState() {
         try {
@@ -438,10 +513,15 @@
           const initial = emptyState();
           return {
             ...initial,
-            profile: parsed.profile && typeof parsed.profile === "object" ? parsed.profile : null,
+            profile: parsed.profile && typeof parsed.profile === "object" ? {
+              ...parsed.profile,
+              role: parsed.profile.role === "mentor" ? "mentor" : "mentee",
+              mentor: parsed.profile.mentor && typeof parsed.profile.mentor === "object" ? parsed.profile.mentor : { subjects: [], shareConsent: false }
+            } : null,
             requests: Array.isArray(parsed.requests) ? parsed.requests : [],
             plans: Array.isArray(parsed.plans) ? parsed.plans : [],
             groups: Array.isArray(parsed.groups) ? parsed.groups : [],
+            connections: Array.isArray(parsed.connections) ? parsed.connections : [],
             theme: parsed.theme === "dark" ? "dark" : "light"
           };
         } catch (error) {
@@ -487,7 +567,8 @@
           $("#mobileNav").style.display = "none";
           return;
         }
-        const markup = (mobile) => navItems.map((item) => {
+        const items = navItems[signedIn ? state.profile.role : "mentee"];
+        const markup = (mobile) => items.map((item) => {
           const text = mobile ? (item.short || item.label) : item.label;
           return `<button class="nav-button ${currentView === item.id ? "active" : ""}" type="button" data-action="navigate" data-view="${item.id}" ${currentView === item.id ? 'aria-current="page"' : ""}>${icon(item.icon)}<span>${text}</span></button>`;
         }).join("");
@@ -497,34 +578,154 @@
       }
 
       function workspaceNotice() {
-        return `<div class="privacy-note">${icon('<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/>')}<div><strong>Private study workspace.</strong> Your profile, requests and plans are saved in this browser on this device. Nothing is sent to tutors or other students. This is not a school account or cloud backup; avoid storing sensitive information.</div></div>`;
+        return `<div class="privacy-note">${icon('<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/>')}<div><strong>Choose what you share.</strong> Your account, requests and plans stay in this browser. Mentor contact details are included in a profile link only when that mentor chooses to share it. The mentee can then contact the mentor by email.</div></div>`;
       }
 
       function profileForm(isEditing = false) {
-        const profile = state.profile || { name: "", programme: "Computer Science", level: "100" };
-        return `<form class="card" data-form="profile">
-          <h2>${isEditing ? "Update your study profile" : "Set up your study planner"}</h2>
-          <p class="muted">${isEditing ? "Change your local profile at any time." : "Choose your programme and level so your course list is relevant to you."}</p>
+        const profile = state.profile || { name: "", programme: "Computer Science", level: "100", role: "mentee" };
+        const mentor = profile.mentor || {};
+        const role = profile.role === "mentor" ? "mentor" : "mentee";
+        return `<form class="card" data-form="profile" data-editing="${isEditing}">
+          <h2>${isEditing ? "Update your LNK profile" : "Choose how you’ll use LNK"}</h2>
+          <p class="muted">${isEditing ? "Change your role and profile information at any time." : "Select your role first. Mentees find study mentors; mentors create a profile mentees can contact."}</p>
+          <fieldset class="field">
+            <legend>Continue as</legend>
+            <div class="role-options">
+              <label class="role-option ${role === "mentee" ? "selected" : ""}"><input type="radio" name="role" value="mentee" ${role === "mentee" ? "checked" : ""}><span class="role-icon">${icon('<circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1m2-8 2 2 4-4"/>')}</span><span><strong>I’m a mentee</strong><small>Find a mentor for a course or topic.</small></span></label>
+              <label class="role-option ${role === "mentor" ? "selected" : ""}"><input type="radio" name="role" value="mentor" ${role === "mentor" ? "checked" : ""}><span class="role-icon">${icon('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0M19 4v4m-2-2h4"/>')}</span><span><strong>I’m a mentor</strong><small>Share what you can teach and how to reach you.</small></span></label>
+            </div>
+          </fieldset>
           <div class="form-grid">
             <div class="field wide"><label for="profileName">Your name</label><input class="input" id="profileName" name="name" maxlength="70" autocomplete="name" placeholder="e.g. Alex" value="${escapeHtml(profile.name)}" required></div>
             <div class="field"><label for="profileProgramme">Programme</label><select class="input" id="profileProgramme" name="programme" required>${selectOptions(Object.keys(programmes), profile.programme)}</select></div>
             <div class="field"><label for="profileLevel">Study level</label><select class="input" id="profileLevel" name="level" required>${selectOptions(["100", "200", "300", "400"], String(profile.level))}</select></div>
+            <div class="field wide"><label for="profileEmail">Your email <span class="muted">${role === "mentor" ? "(required for mentees to contact you)" : "(optional)"}</span></label><input class="input" id="profileEmail" name="email" type="email" maxlength="120" autocomplete="email" placeholder="you@example.com" value="${escapeHtml(role === "mentor" ? mentor.email || "" : profile.email || "")}" ${role === "mentor" ? "required" : ""}></div>
           </div>
-          <button class="button full" type="submit">${isEditing ? "Save profile" : "Create my local profile"}</button>
-          ${isEditing ? "" : '<p class="help" style="text-align:center;margin:12px 0 0">No password or account required. Your profile stays in this browser.</p>'}
+          <div id="mentorFields" ${role !== "mentor" ? "hidden" : ""}>
+            <div class="field"><label for="mentorSubjects">Courses or subjects you can teach</label><textarea class="input" id="mentorSubjects" name="subjects" maxlength="400" placeholder="Separate subjects with commas, e.g. Data Structures, Programming Fundamentals">${escapeHtml((mentor.subjects || []).join(", "))}</textarea><small>List one or more subjects. Mentees use these to find a relevant mentor.</small></div>
+            <div class="field"><label for="mentorBio">About your mentoring</label><textarea class="input" id="mentorBio" name="bio" maxlength="500" placeholder="Describe your experience and how you like to help">${escapeHtml(mentor.bio || "")}</textarea></div>
+            <div class="form-grid">
+              <div class="field"><label for="mentorAvailability">Availability</label><input class="input" id="mentorAvailability" name="availability" maxlength="200" placeholder="e.g. Weekday evenings" value="${escapeHtml(mentor.availability || "")}"></div>
+              <div class="field"><label for="mentorFormat">Meeting format</label><select class="input" id="mentorFormat" name="format">${selectOptions(["Online", "In person", "Online or in person"], mentor.format || "Online")}</select></div>
+              <div class="field"><label for="mentorRate">Rate <span class="muted">(optional)</span></label><input class="input" id="mentorRate" name="rate" maxlength="40" placeholder="e.g. Free or ₦2,000/hour" value="${escapeHtml(mentor.rate || "")}"></div>
+            </div>
+            <label class="check-row"><input type="checkbox" name="shareConsent" ${mentor.shareConsent ? "checked" : ""}><span>I understand that sharing my mentor profile creates a link containing my name, subjects, profile and email address. Anyone with the link can see that information.</span></label>
+          </div>
+          <button class="button full" type="submit">${isEditing ? "Save profile" : "Continue as a " + role}</button>
+          ${isEditing ? "" : '<p class="help" style="text-align:center;margin:12px 0 0">This one-file app stores profiles in this browser; it has no password login or shared database. Mentors connect with mentees through a profile link and email.</p>'}
         </form>`;
       }
 
       function renderWelcome() {
         return `<section class="welcome">
           <p class="eyebrow">Your study space</p>
-          <h1>Make a little more room for learning.</h1>
-          <p class="intro">Organise courses you want help with, plan study sessions and prepare invitations for a study group. Keep your study plans in one simple place.</p>
+          <h1>Find the right person to learn with.</h1>
+          <p class="intro">LNK brings mentees looking for course support together with mentors who can share their knowledge. Choose your role to get started.</p>
           ${storageWarning ? `<p class="privacy-note" role="alert">${escapeHtml(storageWarning)}</p>` : ""}
+          ${incomingMentor ? `<div class="match-banner"><strong>A mentor shared this profile with you.</strong><p>${escapeHtml(incomingMentor.name)} can help with ${escapeHtml(incomingMentor.subjects.join(", "))}. Create a mentee profile to view their details and contact them.</p></div>` : ""}
           ${workspaceNotice()}
           ${profileForm()}
-          <p class="page-footer">LNK is a personal organiser. It does not create accounts, find real tutors or send your requests to other students.</p>
+          <p class="page-footer">No password is collected. Your profile stays on this device. Mentor profiles are shared by link, and introductions are sent using your email app.</p>
         </section>`;
+      }
+
+      function savedMentorProfile() {
+        if (state.profile?.role !== "mentor") return null;
+        return {
+          id: "my-mentor-profile",
+          name: state.profile.name,
+          email: state.profile.mentor.email,
+          programme: state.profile.programme,
+          level: state.profile.level,
+          subjects: state.profile.mentor.subjects,
+          bio: state.profile.mentor.bio,
+          availability: state.profile.mentor.availability,
+          format: state.profile.mentor.format,
+          rate: state.profile.mentor.rate
+        };
+      }
+
+      function mentorCard(mentor, isIncoming = false, isOwn = false) {
+        const subjects = Array.isArray(mentor.subjects) ? mentor.subjects : [];
+        const email = String(mentor.email || "");
+        const queryTerms = matchRequest ? meaningfulTerms(matchQuery) : matchQuery.toLowerCase().split(/\s+/).filter(Boolean);
+        const subjectMatch = queryTerms.length > 0
+          && queryTerms.every((term) => subjects.join(" ").toLowerCase().includes(term));
+        const requestMatch = state.requests.some((request) => {
+          if (request.status === "done") return false;
+          const subjectText = subjects.join(" ").toLowerCase();
+          const courseTerms = meaningfulTerms(request.course);
+          return courseTerms.length > 0 && courseTerms.every((term) => subjectText.includes(term));
+        });
+        const matchLabel = subjectMatch || requestMatch ? "Matches your study needs" : "Shared mentor profile";
+        const initials = mentor.name.split(/\s+/).slice(0, 2).map((part) => part[0] || "").join("").toUpperCase();
+        const subjectChips = subjects.map((item) => `<span class="subject-chip">${escapeHtml(item)}</span>`).join("");
+        const contactSubject = encodeURIComponent(`LNK mentoring enquiry${matchQuery ? `: ${matchQuery}` : ""}`);
+        const contactBody = encodeURIComponent(`Hello ${mentor.name},\n\nI found your mentor profile on LNK and would like to ask about mentoring for ${matchQuery || subjects[0] || "my studies"}.\n\nAre you available to discuss this?\n`);
+        return `<article class="card mentor-card" data-searchable="${escapeHtml(`${mentor.name} ${mentor.programme} ${subjects.join(" ")} ${mentor.bio || ""}`.toLowerCase())}">
+          <div class="item-head">
+            <div class="person" style="min-width:0">
+              <span class="mentor-avatar" aria-hidden="true">${escapeHtml(initials)}</span>
+              <div><h3 style="margin:0">${escapeHtml(mentor.name)}</h3><span class="muted">${escapeHtml(mentor.programme)} · ${escapeHtml(mentor.level)} level</span></div>
+            </div>
+            <span class="badge">${matchLabel}</span>
+          </div>
+          <div class="mentor-subjects">${subjectChips}</div>
+          ${mentor.bio ? `<p class="request-details">${escapeHtml(mentor.bio)}</p>` : ""}
+          <div class="availability-list">
+            <div class="availability-item">${icon('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>')}<div><strong>Availability</strong><span>${escapeHtml(mentor.availability || "Ask by email")}</span></div></div>
+            <div class="availability-item">${icon('<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>')}<div><strong>Meeting format</strong><span>${escapeHtml(mentor.format || "Ask by email")}</span></div></div>
+            ${mentor.rate ? `<div class="availability-item">${icon('<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18m-12 5h4"/>')}<div><strong>Rate</strong><span>${escapeHtml(mentor.rate)}</span></div></div>` : ""}
+          </div>
+          <div class="card-actions">
+            <a class="button" href="mailto:${encodeURIComponent(email)}?subject=${contactSubject}&body=${contactBody}">Email ${escapeHtml(mentor.name.split(/\s+/)[0])}</a>
+            ${isIncoming ? `<button class="button secondary" type="button" data-action="save-mentor" data-id="${escapeHtml(mentor.id)}">Save mentor</button>` : isOwn ? "" : `<button class="button secondary" type="button" data-action="remove-mentor" data-id="${escapeHtml(mentor.id)}">Remove</button>`}
+          </div>
+          ${isIncoming ? '<p class="help">This mentor details were shared with you in this link. Email opens your mail app; LNK does not send the message.</p>' : ""}
+        </article>`;
+      }
+
+      function renderMatches() {
+        const savedIds = new Set(state.connections.map((mentor) => mentor.id));
+        const incoming = incomingMentor && state.profile.role === "mentee" && !savedIds.has(incomingMentor.id) ? incomingMentor : null;
+        const mentors = [...(incoming ? [incoming] : []), ...state.connections.filter((mentor) => !incoming || mentor.id !== incoming.id)];
+        const queryTerms = matchRequest ? meaningfulTerms(matchQuery) : matchQuery.toLowerCase().split(/\s+/).filter(Boolean);
+        const filteredMentors = mentors.filter((mentor) => {
+          const searchable = matchRequest
+            ? (mentor.subjects || []).join(" ").toLowerCase()
+            : `${mentor.name} ${mentor.programme} ${(mentor.subjects || []).join(" ")} ${mentor.bio || ""}`.toLowerCase();
+          return queryTerms.every((term) => searchable.includes(term));
+        });
+        return `<p class="eyebrow">Mentee workspace</p><h1>Find a mentor</h1>
+          <p class="intro">Find someone who can help with your course, then email them directly to discuss a session. LNK does not operate a shared tutor directory; mentors appear here when they share a profile link with you.</p>
+          ${incoming ? `<div class="match-banner"><strong>A mentor profile was shared with you.</strong><p>Review their courses and details, then save the profile or contact them by email.</p></div>` : ""}
+          <div class="card">
+            <h2>Open a mentor’s shared link</h2>
+            <p class="muted">Ask your mentor to send their LNK profile link. Paste it below to add their profile to your private list.</p>
+            <form class="row-form" data-form="mentor-link"><label class="sr-only" for="mentorLink">Mentor profile link</label><input class="input" id="mentorLink" type="url" name="link" placeholder="Paste the mentor profile link" required><button class="button" type="submit">Find mentor</button></form>
+          </div>
+          <div class="toolbar"><input class="input" type="search" data-search placeholder="Search a name, course or topic" value="${escapeHtml(matchQuery)}" aria-label="Search shared mentor profiles"><span class="muted">${mentors.length} shared profile${mentors.length === 1 ? "" : "s"}</span></div>
+          ${filteredMentors.length ? filteredMentors.map((mentor) => mentorCard(mentor, mentor === incoming)).join("") : mentors.length ? "" : sectionEmpty("No mentor profiles yet", "A mentor can create their profile, then send you a link to it. Until then, LNK can’t search or contact mentors on its own.", null, null)}
+          ${mentors.length ? `<div class="empty" id="searchEmpty" ${queryTerms.length && !filteredMentors.length ? "" : "hidden"}><h3>No matching mentors</h3><p>Try a different name or course, or ask another mentor for their profile link.</p></div>` : ""}
+          <p class="page-footer">The profile link contains the mentor’s name, subjects, availability and email address. Only share it if you’re comfortable sharing those details.</p>`;
+      }
+
+      function renderMentorProfile() {
+        const mentor = savedMentorProfile();
+        if (!mentor || !mentor.subjects.length || !mentor.email || !state.profile.mentor.shareConsent) {
+          return `<p class="eyebrow">Mentor workspace</p><h1>Your mentor profile</h1>
+            <p class="intro">Add the subjects you can teach and an email address so mentees can learn about you and get in touch.</p>
+            ${profileForm(true)}`;
+        }
+        return `<p class="eyebrow">Mentor workspace</p><h1>Your mentor profile</h1>
+          <p class="intro">This is the profile mentees see when you share your LNK link. Your public email address is included in that link.</p>
+          ${mentorCard(mentor, false, true)}
+          <section class="card">
+            <h2>Share your profile</h2>
+            <p class="muted">Send this link to a mentee. They can open your profile and contact you using their own email app. LNK does not host a public mentor directory.</p>
+            <div class="button-row"><button class="button" type="button" data-action="share-mentor">Share mentor link</button><button class="button secondary" type="button" data-action="copy-mentor">Copy mentor link</button><button class="button secondary" type="button" data-action="edit-profile">Edit profile</button></div>
+            ${location.protocol === "file:" ? '<p class="help">This page is currently opened as a local file. A file link will only work on your own device. Publish LNK on a web host before sending mentor links to other people.</p>' : ""}
+          </section>`;
       }
 
       function priorityBadge(priority) {
@@ -540,6 +741,7 @@
           <div class="card-actions">
             <button class="button secondary small" type="button" data-action="toggle-request" data-id="${escapeHtml(request.id)}">${done ? "Reopen" : "Mark complete"}</button>
             <button class="button secondary small" type="button" data-action="edit-request" data-id="${escapeHtml(request.id)}">Edit</button>
+            ${state.profile?.role === "mentee" ? `<button class="button secondary small" type="button" data-action="find-mentor" data-id="${escapeHtml(request.id)}">Find a mentor for this</button>` : ""}
             <button class="button secondary small" type="button" data-action="plan-from-request" data-id="${escapeHtml(request.id)}">Plan a study session</button>
             <button class="button danger small" type="button" data-action="delete-request" data-id="${escapeHtml(request.id)}">Delete</button>
           </div>
@@ -583,21 +785,34 @@
       }
 
       function renderHome() {
+        const profile = state.profile;
+        if (profile.role === "mentor") {
+          const mentor = savedMentorProfile();
+          const complete = mentor?.subjects.length && mentor.email && profile.mentor.shareConsent;
+          return `<p class="eyebrow">Mentor workspace</p>
+            <h1>Welcome, ${escapeHtml(profile.name.split(/\s+/)[0])}.</h1>
+            <p class="muted">${escapeHtml(profile.programme)} · ${escapeHtml(profile.level)} level</p>
+            ${workspaceNotice()}
+            <section class="hero"><h2>Share what you know.</h2><p>Tell mentees which subjects you can teach, add your availability, and share your profile link so they can contact you.</p><div class="button-row"><button class="button" type="button" data-action="navigate" data-view="mentor">${complete ? "View and share my profile" : "Finish my mentor profile"}</button></div></section>
+            ${complete ? mentorCard(mentor, false, true) : sectionEmpty("Complete your mentor details", "Add your teaching subjects, contact email, and consent to create a shareable mentor link.", "navigate-mentor", "Finish mentor profile")}
+            <section class="card"><h2>How mentees reach you</h2><div class="availability-list"><div class="availability-item"><strong>1.</strong><span>Share your mentor profile link directly with a mentee.</span></div><div class="availability-item"><strong>2.</strong><span>They review your subjects and availability.</span></div><div class="availability-item"><strong>3.</strong><span>They email you to arrange a session.</span></div></div><p class="help">Your email is visible to anyone who has your share link. LNK does not publish an open directory or store messages.</p></section>
+            <p class="page-footer">The profile on this device is local. For other people to open your share link, LNK must be hosted online.</p>`;
+        }
         const openRequests = state.requests.filter((item) => item.status !== "done").length;
         const upcoming = state.plans.filter((item) => item.status !== "done").length;
-        const profile = state.profile;
         return `<p class="eyebrow">Your workspace</p>
           <h1>Welcome back, ${escapeHtml(profile.name.split(/\s+/)[0])}.</h1>
-          <p class="muted">Level ${escapeHtml(profile.level)} · ${escapeHtml(profile.programme)}</p>
+          <p class="muted">Mentee · ${escapeHtml(profile.programme)} · ${escapeHtml(profile.level)} level</p>
           ${storageWarning ? `<p class="privacy-note" role="alert">${escapeHtml(storageWarning)}</p>` : ""}
           ${workspaceNotice()}
-          <section class="hero"><h2>What would you like to work on?</h2><p>Add a topic you need help with, set a time to study, or draft an invitation to share with classmates.</p><div class="button-row"><button class="button" type="button" data-action="add-request">Add a study request</button><button class="button secondary" type="button" data-action="add-plan">Plan a session</button></div></section>
-          <div class="stats"><div class="stat"><strong>${openRequests}</strong><span>Open study requests</span></div><div class="stat"><strong>${upcoming}</strong><span>Planned sessions</span></div><div class="stat"><strong>${state.groups.length}</strong><span>Invitation drafts</span></div></div>
+          <section class="hero"><h2>Find the right mentor for your course.</h2><p>Search profiles shared with you, compare subjects and availability, then contact a mentor directly.</p><div class="button-row"><button class="button" type="button" data-action="navigate" data-view="matches">Find a mentor</button><button class="button secondary" type="button" data-action="add-request">Add a study request</button></div></section>
+          <div class="stats"><div class="stat"><strong>${openRequests}</strong><span>Open study requests</span></div><div class="stat"><strong>${upcoming}</strong><span>Planned study sessions</span></div><div class="stat"><strong>${state.connections.length}</strong><span>Saved mentors</span></div></div>
+          ${incomingMentor && !state.connections.some((mentor) => mentor.id === incomingMentor.id) ? `<div class="match-banner"><strong>${escapeHtml(incomingMentor.name)} shared a mentor profile with you.</strong><p>Review their teaching subjects and get in touch.</p><button class="button small" type="button" data-action="navigate" data-view="matches">View shared mentor</button></div>` : ""}
           <div class="section-heading"><h2>Study requests</h2><button class="button secondary small" type="button" data-action="navigate" data-view="requests">View all</button></div>
           ${openRequests ? state.requests.filter((item) => item.status !== "done").slice(0, 3).map(requestCard).join("") : sectionEmpty("Nothing to chase yet", "Add a course and topic to keep track of what you want to understand.", "add-request", "Add a study request")}
           <div class="section-heading"><h2>Next study sessions</h2><button class="button secondary small" type="button" data-action="navigate" data-view="plans">View plans</button></div>
           ${upcoming ? state.plans.filter((item) => item.status !== "done").slice().sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`)).slice(0, 2).map(planCard).join("") : sectionEmpty("No sessions planned", "Choose a course and set aside time for it.", "add-plan", "Plan a study session")}
-          <p class="page-footer">LNK keeps your planner on this device. It does not connect you to tutors or send messages.</p>`;
+          <p class="page-footer">LNK helps you find mentors through shared profile links. Email is sent from your own email app.</p>`;
       }
 
       function renderRequests() {
@@ -605,7 +820,7 @@
         const done = state.requests.filter((item) => item.status === "done");
         const list = [...open, ...done];
         return `<p class="eyebrow">Keep track</p><h1>Study requests</h1>
-          <p class="intro">A study request is a private reminder of a course or topic you want help with. It is saved here for you; it is not sent to a tutor, teacher or other student.</p>
+          <p class="intro">Save the course and topic you want help with. Use “Find a mentor for this” to look for someone whose shared profile covers that subject.</p>
           <div class="toolbar"><input class="input" type="search" data-search placeholder="Search your requests" aria-label="Search your study requests"><button class="button" type="button" data-action="add-request">Add request</button></div>
           ${list.length ? list.map(requestCard).join("") : sectionEmpty("No requests yet", "Save a course and a topic you want to focus on.", "add-request", "Add your first request")}
           ${list.length ? '<div class="empty" id="searchEmpty" hidden><h3>No matching requests</h3><p>Try another course or topic.</p></div>' : ""}
@@ -629,12 +844,12 @@
 
       function renderProfile() {
         return `<p class="eyebrow">Your details</p><h1>My profile</h1>
-          <p class="intro">This profile helps LNK show relevant courses. It is stored locally in this browser and is not connected to a school account.</p>
+          <p class="intro">Your role controls the LNK workspace you see. Change from mentee to mentor or update your study details here.</p>
           ${profileForm(true)}
           <section class="card"><h2>Your data</h2><p class="muted">Export a backup of your profile, study requests, session plans and invitation drafts, or erase this browser’s LNK data.</p>
             <div class="button-row"><button class="button secondary" type="button" data-action="export">Export my data</button><button class="button danger" type="button" data-action="erase">Erase my data</button></div>
           </section>
-          <section class="card"><h2>What LNK does</h2><p class="muted">Organises your study requests, plans and invitation drafts on this device. It does not create a secure login, match real tutors, send help requests, message classmates, or synchronise data between devices.</p></section>`;
+          <section class="card"><h2>How connections work</h2><p class="muted">Mentees open a mentor’s shared profile link and email them directly. LNK has no password-based login or shared database, so profiles are not discoverable unless someone shares a link with you.</p></section>`;
       }
 
       function render() {
@@ -646,7 +861,9 @@
           main.innerHTML = renderWelcome();
           return;
         }
-        const pages = { home: renderHome, requests: renderRequests, plans: renderPlans, groups: renderGroups, profile: renderProfile };
+        const pages = state.profile.role === "mentor"
+          ? { home: renderHome, mentor: renderMentorProfile, plans: renderPlans, groups: renderGroups, profile: renderProfile }
+          : { home: renderHome, matches: renderMatches, requests: renderRequests, plans: renderPlans, groups: renderGroups, profile: renderProfile };
         if (!pages[currentView]) currentView = "home";
         main.innerHTML = pages[currentView]();
       }
@@ -726,16 +943,123 @@
         const name = String(data.get("name") || "").trim();
         const programme = String(data.get("programme") || "");
         const level = Number(data.get("level"));
+        const role = String(data.get("role") || "");
+        const email = String(data.get("email") || "").trim();
+        const subjects = [...new Set(String(data.get("subjects") || "").split(",").map((item) => item.trim()).filter(Boolean))].slice(0, 20);
+        const bio = String(data.get("bio") || "").trim();
+        const availability = String(data.get("availability") || "").trim();
+        const format = String(data.get("format") || "Online");
+        const rate = String(data.get("rate") || "").trim();
+        const shareConsent = data.has("shareConsent");
         if (!name || name.length > 70 || !programmes[programme] || ![100, 200, 300, 400].includes(level)) {
           showToast("Please enter a name, programme and study level.");
           return;
         }
+        if (!["mentor", "mentee"].includes(role)) {
+          showToast("Choose whether you’re joining LNK as a mentor or mentee.");
+          return;
+        }
+        if (email && (email.length > 120 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) {
+          showToast("Enter a valid email address.");
+          return;
+        }
+        if (role === "mentor" && (!email || subjects.length === 0 || !shareConsent)) {
+          showToast("Mentors need a valid contact email, at least one subject, and consent to create a shareable profile.");
+          return;
+        }
+        if (subjects.some((item) => item.length > 80) || bio.length > 500 || availability.length > 200 || rate.length > 40
+          || !["Online", "In person", "Online or in person"].includes(format)) {
+          showToast("Please check your mentor profile details and try again.");
+          return;
+        }
+        const previousMentor = state.profile?.mentor || { subjects: [], shareConsent: false };
         if (commit((next) => {
-          next.profile = { name, programme, level };
+          next.profile = {
+            name,
+            programme,
+            level,
+            role,
+            email: role === "mentee" ? email : "",
+            mentor: role === "mentor"
+              ? { email, subjects, bio, availability, format, rate, shareConsent }
+              : previousMentor
+          };
         })) {
           currentView = "home";
           render();
-          showToast("Your local study profile is saved.");
+          showToast(role === "mentor" ? "Your mentor profile is saved on this device." : "Your mentee profile is saved on this device.");
+        }
+      }
+
+      function readMentorLink(value) {
+        try {
+          const url = new URL(value);
+          if (!["https:", "http:", "file:"].includes(url.protocol)) return null;
+          return decodeSharedMentor(new URLSearchParams(url.hash.slice(1)).get("mentor"));
+        } catch {
+          return null;
+        }
+      }
+
+      function handleMentorLink(form) {
+        const mentor = readMentorLink(String(new FormData(form).get("link") || "").trim());
+        if (!mentor) {
+          showToast("That link doesn’t contain a valid LNK mentor profile. Ask the mentor to copy their profile link again.");
+          return;
+        }
+        const exists = state.connections.some((item) => item.id === mentor.id);
+        if (exists) {
+          showToast("This mentor is already in your saved profiles.");
+          return;
+        }
+        if (commit((next) => { next.connections.unshift(mentor); })) {
+          matchQuery = "";
+          matchRequest = false;
+          render();
+          showToast(`${mentor.name} was added to your saved mentor profiles.`);
+        }
+      }
+
+      function mentorShareUrl() {
+        const mentor = savedMentorProfile();
+        if (!mentor || !state.profile.mentor.shareConsent) return null;
+        const url = new URL(location.href);
+        url.hash = `mentor=${encodeShare({
+          type: "lnk-mentor",
+          name: mentor.name,
+          email: mentor.email,
+          programme: mentor.programme,
+          level: mentor.level,
+          subjects: mentor.subjects,
+          bio: mentor.bio,
+          availability: mentor.availability,
+          format: mentor.format,
+          rate: mentor.rate
+        })}`;
+        return url.href;
+      }
+
+      async function shareMentor(copyOnly = false) {
+        const url = mentorShareUrl();
+        if (!url) {
+          showToast("Complete your mentor profile and agree to share it before creating a link.");
+          return;
+        }
+        if (!copyOnly && navigator.share) {
+          try {
+            await navigator.share({ title: "My LNK mentor profile", text: "Here’s my mentor profile on LNK.", url });
+            return;
+          } catch (error) {
+            if (error.name === "AbortError") return;
+          }
+        }
+        try {
+          await navigator.clipboard.writeText(url);
+          showToast("Mentor profile link copied. Share it directly with a mentee.");
+        } catch {
+          showModal("Copy your mentor profile link", "This link includes your name, subjects and email address. Share it only with people you choose.", `<div class="field"><label for="shareText">Mentor profile link</label><textarea class="input" id="shareText" readonly>${escapeHtml(url)}</textarea></div>`);
+          $("#shareText").focus();
+          $("#shareText").select();
         }
       }
 
@@ -848,12 +1172,12 @@
       }
 
       function exportData() {
-        const backup = { app: "LNK study planner", version: state.version, exportedAt: new Date().toISOString(), data: state };
+        const backup = { app: "LNK mentor matching", version: state.version, exportedAt: new Date().toISOString(), data: state };
         const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = `lnk-study-planner-${localDate()}.json`;
+        link.download = `lnk-data-${localDate()}.json`;
         link.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
         showToast("Your data backup was downloaded.");
@@ -876,7 +1200,37 @@
         const action = button.dataset.action;
         const id = button.dataset.id;
         if (action === "home") return navigate(state.profile ? "home" : "welcome");
-        if (action === "navigate") return navigate(button.dataset.view);
+        if (action === "navigate") {
+          if (button.dataset.view === "matches") {
+            matchQuery = "";
+            matchRequest = false;
+          }
+          return navigate(button.dataset.view);
+        }
+        if (action === "navigate-mentor") return navigate("mentor");
+        if (action === "edit-profile") return navigate("profile");
+        if (action === "share-mentor") return shareMentor();
+        if (action === "copy-mentor") return shareMentor(true);
+        if (action === "save-mentor") {
+          if (!incomingMentor || state.connections.some((mentor) => mentor.id === incomingMentor.id)) return;
+          if (commit((next) => { next.connections.unshift(incomingMentor); })) {
+            render();
+            showToast("Mentor profile saved on this device.");
+          }
+          return;
+        }
+        if (action === "remove-mentor") {
+          if (!confirm("Remove this mentor from your saved profiles?")) return;
+          if (commit((next) => { next.connections = next.connections.filter((mentor) => mentor.id !== id); })) render();
+          return;
+        }
+        if (action === "find-mentor") {
+          const request = state.requests.find((item) => item.id === id);
+          if (!request) return;
+          matchQuery = request.course;
+          matchRequest = true;
+          return navigate("matches");
+        }
         if (action === "close-modal") return closeModal();
         if (action === "theme") {
           if (commit((next) => { next.theme = next.theme === "dark" ? "light" : "dark"; })) {
@@ -962,6 +1316,7 @@
         if (!(form instanceof HTMLFormElement)) return;
         event.preventDefault();
         if (form.dataset.form === "profile") handleProfile(form);
+        if (form.dataset.form === "mentor-link") handleMentorLink(form);
         if (form.dataset.form === "request") handleRequest(form);
         if (form.dataset.form === "plan") handlePlan(form);
         if (form.dataset.form === "group") handleGroup(form);
@@ -971,13 +1326,37 @@
         const search = event.target;
         if (!(search instanceof HTMLInputElement) || !search.matches("[data-search]")) return;
         const query = search.value.trim().toLocaleLowerCase();
+        if (currentView === "matches") {
+          matchQuery = query;
+          matchRequest = false;
+        }
+        const terms = query.split(/\s+/).filter(Boolean);
         let visible = 0;
         document.querySelectorAll("[data-searchable]").forEach((item) => {
-          item.hidden = !item.dataset.searchable.includes(query);
+          item.hidden = !terms.every((term) => item.dataset.searchable.includes(term));
           if (!item.hidden) visible += 1;
         });
         const empty = $("#searchEmpty");
         if (empty) empty.hidden = !query || visible > 0;
+      });
+
+      document.addEventListener("change", (event) => {
+        const radio = event.target;
+        if (!(radio instanceof HTMLInputElement) || radio.name !== "role" || !radio.checked) return;
+        const form = radio.form;
+        if (!form || form.dataset.form !== "profile") return;
+        const isMentor = radio.value === "mentor";
+        const mentorFields = $("#mentorFields", form);
+        const email = $("#profileEmail", form);
+        const emailLabel = $("label[for='profileEmail'] .muted", form);
+        const submit = $("button[type='submit']", form);
+        if (mentorFields) mentorFields.hidden = !isMentor;
+        if (email) email.required = isMentor;
+        if (emailLabel) emailLabel.textContent = isMentor ? "(required for mentees to contact you)" : "(optional)";
+        if (submit) submit.textContent = form.dataset.editing === "true"
+          ? "Save profile"
+          : `Continue as a ${radio.value}`;
+        form.querySelectorAll(".role-option").forEach((option) => option.classList.toggle("selected", option.contains(radio)));
       });
 
       document.addEventListener("keydown", (event) => {

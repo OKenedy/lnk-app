@@ -270,8 +270,8 @@
       body { background: #e9eef8; }
       .app { max-width: 1440px; min-height: 100vh; margin: 0 auto; background: var(--bg); box-shadow: 0 0 60px rgba(4,20,63,.09); }
       .top { min-height: 72px; padding: 12px 32px; }
-      .layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); align-items: start; max-width: 1280px; min-height: calc(100vh - 72px); margin: 0 auto; padding: 0 24px; }
-      .side-nav { position: sticky; top: 92px; display: block; padding: 26px 15px 24px 0; }
+      .layout.signed-in { display: grid; grid-template-columns: 230px minmax(0, 1fr); align-items: start; max-width: 1280px; min-height: calc(100vh - 72px); margin: 0 auto; padding: 0 24px; }
+      .layout.signed-in .side-nav { position: sticky; top: 92px; display: block; padding: 26px 15px 24px 0; }
       .nav-label { margin: 0 0 10px 12px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
       main { max-width: 960px; padding: 36px 36px 55px; }
       .bottom-nav { display: none !important; }
@@ -480,6 +480,7 @@
 
       function renderNav() {
         const signedIn = Boolean(state.profile);
+        $(".layout").classList.toggle("signed-in", signedIn);
         $("#sideNav").hidden = !signedIn;
         if (!signedIn) {
           $("#desktopNav").innerHTML = "";

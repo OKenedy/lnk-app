@@ -184,6 +184,27 @@
     .meta { display: flex; flex-wrap: wrap; gap: 7px 12px; margin: 10px 0 0; color: var(--muted); font-size: 12px; }
     .match-banner { margin: 15px 0; padding: 16px; border: 1px solid #aac7f2; border-radius: 14px; background: var(--sky); color: var(--ink); }
     .match-banner p { margin: 5px 0 0; color: var(--muted); font-size: 14px; }
+    .match-filters { margin: 15px 0; }
+    .match-filter-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .match-filter-grid .field { margin: 0; }
+    .match-controls { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 15px; }
+    .match-controls .button { flex: 1 1 170px; }
+    .match-results { margin: 20px 0 10px; }
+    .rating-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+    .rating-stars { color: #b27800; font-size: 17px; letter-spacing: .08em; }
+    .match-animation { position: relative; display: grid; min-height: 180px; place-items: center; overflow: hidden; }
+    .match-orbit { position: absolute; width: 110px; height: 110px; border: 1px solid color-mix(in srgb, var(--blue) 35%, transparent); border-radius: 50%; animation: orbit-pulse 1.3s ease-in-out infinite; }
+    .match-orbit::before, .match-orbit::after { position: absolute; width: 13px; height: 13px; border-radius: 50%; background: var(--gold); content: ""; box-shadow: 0 0 16px color-mix(in srgb, var(--gold) 55%, transparent); }
+    .match-orbit::before { top: 8px; left: 18px; animation: orbit-a 1.3s ease-in-out infinite; }
+    .match-orbit::after { right: 12px; bottom: 12px; background: #64a9f5; animation: orbit-b 1.3s ease-in-out infinite; }
+    .match-particles { position: absolute; inset: 0; pointer-events: none; }
+    .match-particles i { position: absolute; top: 50%; left: 50%; width: 7px; height: 7px; border-radius: 50%; background: var(--blue); opacity: 0; animation: particle-merge 1.15s ease-in-out infinite; animation-delay: calc(var(--i) * -70ms); }
+    .match-status { position: relative; z-index: 1; align-self: end; margin: 0 0 12px; padding: 6px 12px; border-radius: 99px; background: var(--card); color: var(--muted); font-size: 13px; }
+    @keyframes orbit-pulse { 50% { transform: scale(.82); opacity: .48; } }
+    @keyframes orbit-a { 50% { transform: translate(34px, 30px) scale(.7); } }
+    @keyframes orbit-b { 50% { transform: translate(-31px, -28px) scale(.7); } }
+    @keyframes particle-merge { 0% { transform: translate(calc(cos(var(--angle)) * 86px), calc(sin(var(--angle)) * 70px)) scale(.45); opacity: 0; } 35% { opacity: .9; } 100% { transform: translate(0, 0) scale(.2); opacity: 0; } }
+    .pau-access-note { border-color: color-mix(in srgb, var(--gold) 65%, var(--line)); }
     .mentor-card { overflow: hidden; }
     .mentor-avatar { display: grid; width: 48px; height: 48px; flex: 0 0 48px; place-items: center; border-radius: 15px; background: var(--navy); color: #fff; font-size: 19px; font-weight: 800; }
     .mentor-subjects { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0; }
@@ -225,7 +246,7 @@
       bottom: 0;
       left: 0;
       display: none;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
       padding: 6px 4px calc(7px + env(safe-area-inset-bottom, 0px));
       border-top: 1px solid var(--line);
       background: var(--card);
@@ -288,6 +309,7 @@
       .stat { padding: 18px; }
       .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .role-options, .availability-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .match-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (min-width: 900px) {
       body { background: #e9eef8; }
@@ -419,6 +441,7 @@
           { id: "matches", label: "Find a mentor", short: "Mentors", icon: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M11 8v6m-3-3h6"/>' },
           { id: "requests", label: "Study requests", short: "Requests", icon: '<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>' },
           { id: "plans", label: "Study plans", short: "Plans", icon: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>' },
+          { id: "groups", label: "Study groups", short: "Groups", icon: '<circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M16 11a3 3 0 0 0 0-6m2 9a5 5 0 0 1 3 4v1"/>' },
           { id: "profile", label: "My profile", short: "Profile", icon: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>' }
         ],
         mentor: [
@@ -430,7 +453,7 @@
         ]
       };
 
-      const emptyState = () => ({ version: 1, profile: null, requests: [], plans: [], groups: [], connections: [], theme: "light" });
+      const emptyState = () => ({ version: 1, profile: null, requests: [], plans: [], groups: [], connections: [], mentorRatings: {}, theme: "light" });
       let state = emptyState();
       let currentView = "home";
       let toastTimer;
@@ -438,6 +461,9 @@
       let storageWarning = "";
       let matchQuery = "";
       let matchRequest = false;
+      let matchFilters = { query: "", programme: "", level: "", format: "", availability: "", rate: "", applied: false };
+      let selectedMatchId = "";
+      let randomMatch = false;
 
       const $ = (selector, root = document) => root.querySelector(selector);
       const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -463,7 +489,7 @@
         ).join("")}`;
       const icon = (path) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
       const meaningfulTerms = (value) => value.toLowerCase().split(/\s+/)
-        .filter((term) => term.length > 2 && !["introduction", "fundamentals", "principles", "and", "the", "for", "with"].includes(term));
+        .filter((term) => term.length > 1 && !["introduction", "fundamentals", "principles", "and", "the", "for", "with", "to", "of", "in", "on", "an", "is"].includes(term));
       const encodeShare = (value) => {
         const bytes = new TextEncoder().encode(JSON.stringify(value));
         let binary = "";
@@ -522,6 +548,11 @@
             plans: Array.isArray(parsed.plans) ? parsed.plans : [],
             groups: Array.isArray(parsed.groups) ? parsed.groups : [],
             connections: Array.isArray(parsed.connections) ? parsed.connections : [],
+            mentorRatings: parsed.mentorRatings && typeof parsed.mentorRatings === "object"
+              ? Object.fromEntries(Object.entries(parsed.mentorRatings).filter(([, rating]) =>
+                rating && Number.isInteger(rating.score) && rating.score >= 1 && rating.score <= 5
+              ).map(([id, rating]) => [id, { score: rating.score, review: String(rating.review || "").slice(0, 300), ratedAt: String(rating.ratedAt || "") }]))
+              : {},
             theme: parsed.theme === "dark" ? "dark" : "light"
           };
         } catch (error) {
@@ -574,11 +605,12 @@
         }).join("");
         $("#desktopNav").innerHTML = markup(false);
         $("#mobileNav").innerHTML = markup(true);
+        $("#mobileNav").style.gridTemplateColumns = `repeat(${items.length}, minmax(0, 1fr))`;
         $("#mobileNav").style.display = "grid";
       }
 
       function workspaceNotice() {
-        return `<div class="privacy-note">${icon('<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/>')}<div><strong>Choose what you share.</strong> Your account, requests and plans stay in this browser. Mentor contact details are included in a profile link only when that mentor chooses to share it. The mentee can then contact the mentor by email.</div></div>`;
+        return `<div class="privacy-note">${icon('<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/>')}<div><strong>Choose what you share.</strong> Your LNK profile, requests and plans stay in this browser. Mentor contact details are included in a profile link only when that mentor chooses to share it. PAU-only access is not verified or enforced in this no-backend version.</div></div>`;
       }
 
       function profileForm(isEditing = false) {
@@ -612,7 +644,7 @@
             <label class="check-row"><input type="checkbox" name="shareConsent" ${mentor.shareConsent ? "checked" : ""}><span>I understand that sharing my mentor profile creates a link containing my name, subjects, profile and email address. Anyone with the link can see that information.</span></label>
           </div>
           <button class="button full" type="submit">${isEditing ? "Save profile" : "Continue as a " + role}</button>
-          ${isEditing ? "" : '<p class="help" style="text-align:center;margin:12px 0 0">This one-file app stores profiles in this browser; it has no password login or shared database. Mentors connect with mentees through a profile link and email.</p>'}
+          ${isEditing ? "" : '<p class="help" style="text-align:center;margin:12px 0 0">This one-file app stores profiles in this browser; it has no password login or shared database. Mentors connect with mentees through a profile link and email. PAU-only access is not enforced yet.</p>'}
         </form>`;
       }
 
@@ -624,6 +656,7 @@
           ${storageWarning ? `<p class="privacy-note" role="alert">${escapeHtml(storageWarning)}</p>` : ""}
           ${incomingMentor ? `<div class="match-banner"><strong>A mentor shared this profile with you.</strong><p>${escapeHtml(incomingMentor.name)} can help with ${escapeHtml(incomingMentor.subjects.join(", "))}. Create a mentee profile to view their details and contact them.</p></div>` : ""}
           ${workspaceNotice()}
+          <div class="privacy-note pau-access-note"><div><strong>PAU-only access is not active yet.</strong> LNK has no verified PAU login. Do not treat this local profile as proof of student status; secure university-only access needs PAU authentication.</div></div>
           ${profileForm()}
           <p class="page-footer">No password is collected. Your profile stays on this device. Mentor profiles are shared by link, and introductions are sent using your email app.</p>
         </section>`;
@@ -661,7 +694,8 @@
         const initials = mentor.name.split(/\s+/).slice(0, 2).map((part) => part[0] || "").join("").toUpperCase();
         const subjectChips = subjects.map((item) => `<span class="subject-chip">${escapeHtml(item)}</span>`).join("");
         const contactSubject = encodeURIComponent(`LNK mentoring enquiry${matchQuery ? `: ${matchQuery}` : ""}`);
-        const contactBody = encodeURIComponent(`Hello ${mentor.name},\n\nI found your mentor profile on LNK and would like to ask about mentoring for ${matchQuery || subjects[0] || "my studies"}.\n\nAre you available to discuss this?\n`);
+        const contactBody = encodeURIComponent(`Hello ${mentor.name},\n\nI found your mentor profile on LNK and would like to ask about mentoring for ${matchQuery || subjects[0] || "my studies"}.\n\nAre you available to discuss this?\n\nI can attach any files in my email app before sending.\n`);
+        const rating = state.mentorRatings[mentor.id];
         return `<article class="card mentor-card" data-searchable="${escapeHtml(`${mentor.name} ${mentor.programme} ${subjects.join(" ")} ${mentor.bio || ""}`.toLowerCase())}">
           <div class="item-head">
             <div class="person" style="min-width:0">
@@ -677,37 +711,186 @@
             <div class="availability-item">${icon('<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>')}<div><strong>Meeting format</strong><span>${escapeHtml(mentor.format || "Ask by email")}</span></div></div>
             ${mentor.rate ? `<div class="availability-item">${icon('<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18m-12 5h4"/>')}<div><strong>Rate</strong><span>${escapeHtml(mentor.rate)}</span></div></div>` : ""}
           </div>
+          ${!isOwn && state.profile?.role === "mentee" ? `<div class="rating-row" aria-label="Private rating">
+            ${rating ? `<span class="rating-stars" aria-label="${rating.score} out of 5 stars">${"★".repeat(rating.score)}${"☆".repeat(5 - rating.score)}</span><span class="muted">Your private rating: ${rating.score}/5</span>` : '<span class="muted">No rating from you yet</span>'}
+            <button class="button secondary small" type="button" data-action="rate-mentor" data-id="${escapeHtml(mentor.id)}">${rating ? "Update private rating" : "Add private rating"}</button>
+          </div>${rating?.review ? `<p class="request-details">${escapeHtml(rating.review)}</p>` : ""}<p class="help">Ratings are private to this browser and are not verified or shared with other students.</p>` : ""}
           <div class="card-actions">
-            <a class="button" href="mailto:${encodeURIComponent(email)}?subject=${contactSubject}&body=${contactBody}">Email ${escapeHtml(mentor.name.split(/\s+/)[0])}</a>
+            ${!isOwn ? `<a class="button" href="mailto:${encodeURIComponent(email)}?subject=${contactSubject}&body=${contactBody}">Message / share a file</a><button class="button secondary" type="button" data-action="book-session" data-id="${escapeHtml(mentor.id)}">Request a session</button>` : ""}
             ${isIncoming ? `<button class="button secondary" type="button" data-action="save-mentor" data-id="${escapeHtml(mentor.id)}">Save mentor</button>` : isOwn ? "" : `<button class="button secondary" type="button" data-action="remove-mentor" data-id="${escapeHtml(mentor.id)}">Remove</button>`}
           </div>
-          ${isIncoming ? '<p class="help">This mentor details were shared with you in this link. Email opens your mail app; LNK does not send the message.</p>' : ""}
+          ${!isOwn ? '<p class="help">Messages and file attachments are handled in your email app, not stored in LNK. A session is not booked until the mentor confirms.</p>' : ""}
         </article>`;
       }
 
-      function renderMatches() {
+      function matchingMentors() {
         const savedIds = new Set(state.connections.map((mentor) => mentor.id));
         const incoming = incomingMentor && state.profile.role === "mentee" && !savedIds.has(incomingMentor.id) ? incomingMentor : null;
         const mentors = [...(incoming ? [incoming] : []), ...state.connections.filter((mentor) => !incoming || mentor.id !== incoming.id)];
-        const queryTerms = matchRequest ? meaningfulTerms(matchQuery) : matchQuery.toLowerCase().split(/\s+/).filter(Boolean);
-        const filteredMentors = mentors.filter((mentor) => {
-          const searchable = matchRequest
-            ? (mentor.subjects || []).join(" ").toLowerCase()
-            : `${mentor.name} ${mentor.programme} ${(mentor.subjects || []).join(" ")} ${mentor.bio || ""}`.toLowerCase();
-          return queryTerms.every((term) => searchable.includes(term));
+        const query = matchFilters.applied ? matchFilters.query : matchQuery;
+        const queryTerms = matchRequest ? meaningfulTerms(matchQuery) : meaningfulTerms(query);
+        const formatMatches = (mentor) => !matchFilters.applied || !matchFilters.format
+          || mentor.format === matchFilters.format || mentor.format === "Online or in person";
+        const availabilityMatches = (mentor) => !matchFilters.applied || !matchFilters.availability
+          || String(mentor.availability || "").toLowerCase().includes(matchFilters.availability.toLowerCase());
+        const rateMatches = (mentor) => {
+          if (!matchFilters.applied || !matchFilters.rate) return true;
+          const rate = String(mentor.rate || "").toLowerCase();
+          const isFree = /\bfree\b|no charge|volunteer/i.test(rate);
+          const isPaid = Boolean(rate) && !isFree;
+          return matchFilters.rate === "free" ? isFree : isPaid;
+        };
+        return mentors.filter((mentor) => {
+          const subjectText = (mentor.subjects || []).join(" ").toLowerCase();
+          const searchable = `${mentor.name} ${mentor.programme} ${subjectText} ${mentor.bio || ""}`.toLowerCase();
+          const queryMatches = queryTerms.every((term) => matchRequest ? subjectText.includes(term) : searchable.includes(term));
+          return queryMatches
+            && (!matchFilters.applied || !matchFilters.programme || mentor.programme === matchFilters.programme)
+            && (!matchFilters.applied || !matchFilters.level || String(mentor.level) === matchFilters.level)
+            && formatMatches(mentor)
+            && availabilityMatches(mentor)
+            && rateMatches(mentor);
         });
+      }
+
+      function renderMatches() {
+        const mentors = matchingMentors();
+        const filteredMentors = selectedMatchId ? mentors.filter((mentor) => mentor.id === selectedMatchId) : mentors;
+        const incomingIsNew = Boolean(incomingMentor && state.profile.role === "mentee"
+          && !state.connections.some((mentor) => mentor.id === incomingMentor.id));
         return `<p class="eyebrow">Mentee workspace</p><h1>Find a mentor</h1>
-          <p class="intro">Find someone who can help with your course, then email them directly to discuss a session. LNK does not operate a shared tutor directory; mentors appear here when they share a profile link with you.</p>
-          ${incoming ? `<div class="match-banner"><strong>A mentor profile was shared with you.</strong><p>Review their courses and details, then save the profile or contact them by email.</p></div>` : ""}
+          <p class="intro">Match with tutors whose shared profiles fit your course, study level, availability and meeting format. You can still add a mentor directly with their profile link.</p>
+          ${incomingIsNew ? `<div class="match-banner"><strong>A mentor profile was shared with you.</strong><p>Review their courses and details, then save the profile or contact them by email.</p></div>` : ""}
+          <section class="card match-filters">
+            <h2>What kind of mentor are you looking for?</h2>
+            <p class="muted">Choose any filters, then match with all suitable shared profiles or pick one at random. Random match only chooses from profiles available below.</p>
+            <form data-form="matching">
+              <div class="match-filter-grid">
+                <div class="field"><label for="matchSubject">Course or topic</label><input class="input" id="matchSubject" name="query" maxlength="100" placeholder="e.g. data structures" value="${escapeHtml(matchFilters.query || (matchRequest ? matchQuery : ""))}"></div>
+                <div class="field"><label for="matchProgramme">Programme</label><select class="input" id="matchProgramme" name="programme"><option value="">Any programme</option>${selectOptions(Object.keys(programmes), matchFilters.programme)}</select></div>
+                <div class="field"><label for="matchLevel">Mentor study level</label><select class="input" id="matchLevel" name="level"><option value="">Any level</option>${selectOptions(["100", "200", "300", "400"], matchFilters.level)}</select></div>
+                <div class="field"><label for="matchFormat">Meeting format</label><select class="input" id="matchFormat" name="format"><option value="">Any format</option>${selectOptions(["Online", "In person"], matchFilters.format)}</select></div>
+                <div class="field"><label for="matchAvailability">Availability keyword</label><input class="input" id="matchAvailability" name="availability" maxlength="60" placeholder="e.g. weekends" value="${escapeHtml(matchFilters.availability)}"></div>
+                <div class="field"><label for="matchRate">Session rate</label><select class="input" id="matchRate" name="rate"><option value="">Any rate</option>${selectOptions(["free", "paid"], matchFilters.rate, "")}</select></div>
+              </div>
+              <div class="match-controls"><button class="button" type="submit">Match me</button><button class="button secondary" type="button" data-action="random-match">Random match</button><button class="button secondary" type="button" data-action="clear-match-filters">Clear filters</button></div>
+            </form>
+          </section>
           <div class="card">
             <h2>Open a mentor’s shared link</h2>
             <p class="muted">Ask your mentor to send their LNK profile link. Paste it below to add their profile to your private list.</p>
             <form class="row-form" data-form="mentor-link"><label class="sr-only" for="mentorLink">Mentor profile link</label><input class="input" id="mentorLink" type="url" name="link" placeholder="Paste the mentor profile link" required><button class="button" type="submit">Find mentor</button></form>
           </div>
-          <div class="toolbar"><input class="input" type="search" data-search placeholder="Search a name, course or topic" value="${escapeHtml(matchQuery)}" aria-label="Search shared mentor profiles"><span class="muted">${mentors.length} shared profile${mentors.length === 1 ? "" : "s"}</span></div>
-          ${filteredMentors.length ? filteredMentors.map((mentor) => mentorCard(mentor, mentor === incoming)).join("") : mentors.length ? "" : sectionEmpty("No mentor profiles yet", "A mentor can create their profile, then send you a link to it. Until then, LNK can’t search or contact mentors on its own.", null, null)}
-          ${mentors.length ? `<div class="empty" id="searchEmpty" ${queryTerms.length && !filteredMentors.length ? "" : "hidden"}><h3>No matching mentors</h3><p>Try a different name or course, or ask another mentor for their profile link.</p></div>` : ""}
-          <p class="page-footer">The profile link contains the mentor’s name, subjects, availability and email address. Only share it if you’re comfortable sharing those details.</p>`;
+          <div class="section-heading match-results"><h2>${selectedMatchId ? (randomMatch ? "Your random match" : "Matching tutor") : "Matching tutors"}</h2><span class="muted">${filteredMentors.length} found</span></div>
+          ${filteredMentors.length ? filteredMentors.map((mentor) => mentorCard(mentor, incomingIsNew && mentor.id === incomingMentor?.id)).join("") : mentors.length || matchFilters.applied ? sectionEmpty("No mentors match those filters", "Try changing a filter, choose Random match again, or paste a mentor profile link above.", null, null) : sectionEmpty("No mentor profiles yet", "Mentors appear here after they share a profile link with you. There is no global directory in this version of LNK.", null, null)}
+          <p class="page-footer">Profile links include the mentor’s contact details. LNK currently matches only profiles shared with you; your filters and random choice run on this device.</p>`;
+      }
+
+      function mentorRatingForm(mentor) {
+        const rating = state.mentorRatings[mentor.id];
+        return `<form class="modal-form" data-form="mentor-rating" data-id="${escapeHtml(mentor.id)}">
+          <div class="field"><label for="mentorRating">Your rating</label><select class="input" id="mentorRating" name="score" required>${selectOptions(["1", "2", "3", "4", "5"], String(rating?.score || ""), "Choose 1 to 5 stars")}</select></div>
+          <div class="field"><label for="mentorReview">Private note <span class="muted">(optional)</span></label><textarea class="input" id="mentorReview" name="review" maxlength="300" placeholder="A reminder for yourself about this mentoring session">${escapeHtml(rating?.review || "")}</textarea></div>
+          <p class="help">This is personal feedback saved only in this browser. It is not a public or verified tutor rating.</p>
+          <button class="button full" type="submit">Save my private rating</button>
+        </form>`;
+      }
+
+      function bookingForm(mentor) {
+        return `<form class="modal-form" data-form="booking" data-id="${escapeHtml(mentor.id)}">
+          <div class="field"><label for="sessionSubject">Course or topic</label><input class="input" id="sessionSubject" name="subject" maxlength="100" value="${escapeHtml(matchQuery || mentor.subjects[0] || "")}" required></div>
+          <div class="form-grid">
+            <div class="field"><label for="sessionDate">Preferred date</label><input class="input" id="sessionDate" name="date" type="date" min="${localDate()}" required></div>
+            <div class="field"><label for="sessionTime">Preferred time</label><input class="input" id="sessionTime" name="time" type="time" required></div>
+          </div>
+          <div class="field"><label for="sessionMessage">Message <span class="muted">(optional)</span></label><textarea class="input" id="sessionMessage" name="message" maxlength="500" placeholder="What would you like to cover?"></textarea></div>
+          <p class="help">This prepares a booking request in your email app. Your session is not booked until the mentor replies and confirms.</p>
+          <button class="button full" type="submit">Prepare session request</button>
+        </form>`;
+      }
+
+      function matchingAnimation(random) {
+        const particles = Array.from({ length: 18 }, (_, index) => `<i style="--i:${index};--angle:${index * 20}deg"></i>`).join("");
+        return `<div class="match-animation" role="status" aria-live="polite">
+          <div class="match-orbit" aria-hidden="true"></div><div class="match-particles" aria-hidden="true">${particles}</div>
+          <p class="match-status">${random ? "Finding a random fit..." : "Combining your filters..."}</p>
+        </div>`;
+      }
+
+      function startMatching(random = false, form = null) {
+        if (form) {
+          const data = new FormData(form);
+          matchFilters = {
+            query: String(data.get("query") || "").trim().slice(0, 100),
+            programme: String(data.get("programme") || ""),
+            level: String(data.get("level") || ""),
+            format: String(data.get("format") || ""),
+            availability: String(data.get("availability") || "").trim().slice(0, 60),
+            rate: String(data.get("rate") || ""),
+            applied: true
+          };
+          matchQuery = matchFilters.query;
+          matchRequest = false;
+        }
+        selectedMatchId = "";
+        randomMatch = false;
+        const candidates = matchingMentors();
+        showModal("Finding your match", "LNK is comparing the filters you chose with mentor profiles shared with you.", matchingAnimation(random));
+        window.setTimeout(() => {
+          closeModal();
+          if (!candidates.length) {
+            render();
+            showToast("No shared mentor profile matches those filters. Try broadening your choices.");
+            return;
+          }
+          if (random) {
+            const selection = candidates[Math.floor(Math.random() * candidates.length)];
+            selectedMatchId = selection.id;
+            randomMatch = true;
+          }
+          render();
+          showToast(random ? "Your random mentor match is ready." : `${candidates.length} matching mentor${candidates.length === 1 ? "" : "s"} found.`);
+        }, 1450);
+      }
+
+      function findMentor(id) {
+        if (incomingMentor?.id === id && state.profile.role === "mentee") return incomingMentor;
+        return state.connections.find((mentor) => mentor.id === id) || null;
+      }
+
+      function handleMentorRating(form) {
+        const id = form.dataset.id;
+        const mentor = findMentor(id);
+        const data = new FormData(form);
+        const score = Number(data.get("score"));
+        const review = String(data.get("review") || "").trim();
+        if (!mentor || !Number.isInteger(score) || score < 1 || score > 5 || review.length > 300) {
+          showToast("Choose a rating from 1 to 5 stars and check your note.");
+          return;
+        }
+        if (commit((next) => {
+          next.mentorRatings[id] = { score, review, ratedAt: new Date().toISOString() };
+        })) {
+          closeModal();
+          render();
+          showToast("Your private rating was saved on this device.");
+        }
+      }
+
+      function handleBooking(form) {
+        const mentor = findMentor(form.dataset.id);
+        const data = new FormData(form);
+        const subject = String(data.get("subject") || "").trim();
+        const date = String(data.get("date") || "");
+        const time = String(data.get("time") || "");
+        const message = String(data.get("message") || "").trim();
+        if (!mentor || !subject || subject.length > 100 || !date || date < localDate() || !time || message.length > 500) {
+          showToast("Choose a topic, today or a future date, and a preferred time.");
+          return;
+        }
+        const body = encodeURIComponent(`Hello ${mentor.name},\n\nI’d like to request a mentoring session about ${subject}.\nMy preferred time is ${formatDate(date)} at ${time}.\n${message ? `\nA bit more about what I need:\n${message}\n` : ""}\nPlease let me know if you’re available. I understand this request is not a confirmed booking until you reply.\n`);
+        const mailto = `mailto:${encodeURIComponent(mentor.email)}?subject=${encodeURIComponent(`LNK session request: ${subject}`)}&body=${body}`;
+        showModal("Session request ready", "LNK prepared an email. Open it and choose Send; your session is only booked after the mentor confirms.", `<div class="card"><p><strong>${escapeHtml(mentor.name)}</strong></p><p class="muted">${escapeHtml(subject)} · ${escapeHtml(formatDate(date))} at ${escapeHtml(time)}</p><a class="button full" href="${mailto}">Open email app to request session</a><p class="help">Emailing the request does not guarantee availability. You can attach files in your email app if needed.</p></div>`);
       }
 
       function renderMentorProfile() {
@@ -836,8 +1019,8 @@
       }
 
       function renderGroups() {
-        return `<p class="eyebrow">Bring people together</p><h1>Group invitations</h1>
-          <p class="intro">Create an invitation draft for a study group, then share it yourself by text, email or another app. LNK does not publish groups, find members or send invitations.</p>
+        return `<p class="eyebrow">Bring people together</p><h1>Study groups</h1>
+          <p class="intro">Create an invitation draft to bring classmates together, then share it yourself by text, email or another app. LNK does not publish a shared group directory or find members automatically.</p>
           <div class="toolbar"><span class="muted">${state.groups.length} invitation${state.groups.length === 1 ? "" : "s"}</span><button class="button" type="button" data-action="add-group">Create invitation</button></div>
           ${state.groups.length ? state.groups.slice().reverse().map(groupCard).join("") : sectionEmpty("No invitations yet", "Make a course-specific invitation you can share with people you already know.", "add-group", "Create an invitation")}`;
       }
@@ -849,7 +1032,7 @@
           <section class="card"><h2>Your data</h2><p class="muted">Export a backup of your profile, study requests, session plans and invitation drafts, or erase this browser’s LNK data.</p>
             <div class="button-row"><button class="button secondary" type="button" data-action="export">Export my data</button><button class="button danger" type="button" data-action="erase">Erase my data</button></div>
           </section>
-          <section class="card"><h2>How connections work</h2><p class="muted">Mentees open a mentor’s shared profile link and email them directly. LNK has no password-based login or shared database, so profiles are not discoverable unless someone shares a link with you.</p></section>`;
+          <section class="card"><h2>How connections work</h2><p class="muted">Mentees open a mentor’s shared profile link and email them directly. LNK has no password-based login or shared database, so profiles are not discoverable unless someone shares a link with you.</p><p class="help">PAU-only authentication is not yet available. A student email typed into this page would not verify identity, so LNK does not claim that access is restricted to PAU students.</p></section>`;
       }
 
       function render() {
@@ -1211,6 +1394,25 @@
         if (action === "edit-profile") return navigate("profile");
         if (action === "share-mentor") return shareMentor();
         if (action === "copy-mentor") return shareMentor(true);
+        if (action === "random-match") return startMatching(true, $("form[data-form='matching']"));
+        if (action === "clear-match-filters") {
+          matchFilters = { query: "", programme: "", level: "", format: "", availability: "", rate: "", applied: false };
+          matchQuery = "";
+          matchRequest = false;
+          selectedMatchId = "";
+          randomMatch = false;
+          return render();
+        }
+        if (action === "rate-mentor") {
+          const mentor = findMentor(id);
+          if (mentor) showModal(`Rate ${mentor.name}`, "Save a private note about your experience. This rating is not shared or verified.", mentorRatingForm(mentor));
+          return;
+        }
+        if (action === "book-session") {
+          const mentor = findMentor(id);
+          if (mentor) showModal(`Request a session with ${mentor.name}`, "Choose a preferred time and prepare an email to the mentor.", bookingForm(mentor));
+          return;
+        }
         if (action === "save-mentor") {
           if (!incomingMentor || state.connections.some((mentor) => mentor.id === incomingMentor.id)) return;
           if (commit((next) => { next.connections.unshift(incomingMentor); })) {
@@ -1229,7 +1431,11 @@
           if (!request) return;
           matchQuery = request.course;
           matchRequest = true;
-          return navigate("matches");
+          matchFilters = { query: request.course, programme: "", level: "", format: "", availability: "", rate: "", applied: true };
+          selectedMatchId = "";
+          randomMatch = false;
+          navigate("matches");
+          return startMatching(false);
         }
         if (action === "close-modal") return closeModal();
         if (action === "theme") {
@@ -1317,9 +1523,12 @@
         event.preventDefault();
         if (form.dataset.form === "profile") handleProfile(form);
         if (form.dataset.form === "mentor-link") handleMentorLink(form);
+        if (form.dataset.form === "matching") startMatching(false, form);
         if (form.dataset.form === "request") handleRequest(form);
         if (form.dataset.form === "plan") handlePlan(form);
         if (form.dataset.form === "group") handleGroup(form);
+        if (form.dataset.form === "mentor-rating") handleMentorRating(form);
+        if (form.dataset.form === "booking") handleBooking(form);
       });
 
       document.addEventListener("input", (event) => {

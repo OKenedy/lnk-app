@@ -435,6 +435,60 @@
         "Introduction to Theology", "World Civilizations", "Peace Studies and Conflict Resolution",
         "General Ethics", "Contemporary Health Issues", "Philosophical Anthropology", "Entrepreneurship"
       ];
+      const demoMentors = [
+        {
+          id: "demo-computing",
+          name: "LNK Demo Bot · Computing",
+          email: "",
+          programme: "Computer Science",
+          level: 300,
+          subjects: ["CSC 301 Data Structures", "Programming Fundamentals", "Computer Science"],
+          bio: "Fictional practice profile. Try the matching, demo chat, and session-request flows.",
+          availability: "Weekends",
+          format: "Online",
+          rate: "Free demo",
+          isDemo: true
+        },
+        {
+          id: "demo-business",
+          name: "LNK Demo Bot · Business",
+          email: "",
+          programme: "Business Administration",
+          level: 200,
+          subjects: ["Marketing", "Business Law", "Principles of Management"],
+          bio: "Fictional practice profile. No real person or appointment is connected to this bot.",
+          availability: "Weekday evenings",
+          format: "In person",
+          rate: "Paid demo",
+          isDemo: true
+        },
+        {
+          id: "demo-media",
+          name: "LNK Demo Bot · Media",
+          email: "",
+          programme: "Mass Communication",
+          level: 300,
+          subjects: ["Journalism", "Public Relations", "Media Research"],
+          bio: "Fictional practice profile. Use it to preview how a shared tutor match looks.",
+          availability: "Flexible",
+          format: "Online or in person",
+          rate: "Free demo",
+          isDemo: true
+        },
+        {
+          id: "demo-finance",
+          name: "LNK Demo Bot · Finance",
+          email: "",
+          programme: "Finance",
+          level: 400,
+          subjects: ["Risk Management", "Portfolio Management"],
+          bio: "Fictional practice profile. This demo cannot provide real tutoring.",
+          availability: "Weekday evenings",
+          format: "Online",
+          rate: "Paid demo",
+          isDemo: true
+        }
+      ];
       const navItems = {
         mentee: [
           { id: "home", label: "Home", icon: '<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>' },
@@ -453,7 +507,7 @@
         ]
       };
 
-      const emptyState = () => ({ version: 1, profile: null, requests: [], plans: [], groups: [], connections: [], mentorRatings: {}, theme: "light" });
+      const emptyState = () => ({ version: 1, profile: null, requests: [], plans: [], groups: [], connections: [], mentorRatings: {}, demoBookings: [], theme: "light" });
       let state = emptyState();
       let currentView = "home";
       let toastTimer;
@@ -461,9 +515,11 @@
       let storageWarning = "";
       let matchQuery = "";
       let matchRequest = false;
-      let matchFilters = { query: "", programme: "", level: "", format: "", availability: "", rate: "", applied: false };
+      let matchFilters = { course: "", programme: "", level: "", format: "", availability: "", rate: "", applied: false };
       let selectedMatchId = "";
       let randomMatch = false;
+      let demoChatMentor = null;
+      let demoChatMessages = [];
 
       const $ = (selector, root = document) => root.querySelector(selector);
       const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -474,6 +530,12 @@
         ...((programmes[programme] || [])[(Number(level) / 100) - 1] || "").split("|").filter(Boolean),
         ...generalCourses
       ];
+      const availabilityOptions = () => [...new Set([
+        "Weekday mornings", "Weekday afternoons", "Weekday evenings", "Weekends", "Flexible",
+        ...demoMentors.map((mentor) => mentor.availability),
+        ...state.connections.map((mentor) => mentor.availability).filter(Boolean),
+        ...(incomingMentor?.availability ? [incomingMentor.availability] : [])
+      ])].sort((a, b) => a.localeCompare(b));
       const localDate = (date = new Date()) => {
         const adjusted = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
         return adjusted.toISOString().slice(0, 10);
@@ -553,6 +615,7 @@
                 rating && Number.isInteger(rating.score) && rating.score >= 1 && rating.score <= 5
               ).map(([id, rating]) => [id, { score: rating.score, review: String(rating.review || "").slice(0, 300), ratedAt: String(rating.ratedAt || "") }]))
               : {},
+            demoBookings: Array.isArray(parsed.demoBookings) ? parsed.demoBookings.slice(0, 50) : [],
             theme: parsed.theme === "dark" ? "dark" : "light"
           };
         } catch (error) {
@@ -695,14 +758,14 @@
         const subjectChips = subjects.map((item) => `<span class="subject-chip">${escapeHtml(item)}</span>`).join("");
         const contactSubject = encodeURIComponent(`LNK mentoring enquiry${matchQuery ? `: ${matchQuery}` : ""}`);
         const contactBody = encodeURIComponent(`Hello ${mentor.name},\n\nI found your mentor profile on LNK and would like to ask about mentoring for ${matchQuery || subjects[0] || "my studies"}.\n\nAre you available to discuss this?\n\nI can attach any files in my email app before sending.\n`);
-        const rating = state.mentorRatings[mentor.id];
+        const rating = mentor.isDemo ? null : state.mentorRatings[mentor.id];
         return `<article class="card mentor-card" data-searchable="${escapeHtml(`${mentor.name} ${mentor.programme} ${subjects.join(" ")} ${mentor.bio || ""}`.toLowerCase())}">
           <div class="item-head">
             <div class="person" style="min-width:0">
               <span class="mentor-avatar" aria-hidden="true">${escapeHtml(initials)}</span>
               <div><h3 style="margin:0">${escapeHtml(mentor.name)}</h3><span class="muted">${escapeHtml(mentor.programme)} · ${escapeHtml(mentor.level)} level</span></div>
             </div>
-            <span class="badge">${matchLabel}</span>
+            <span class="badge">${mentor.isDemo ? "DEMO BOT · fictional" : matchLabel}</span>
           </div>
           <div class="mentor-subjects">${subjectChips}</div>
           ${mentor.bio ? `<p class="request-details">${escapeHtml(mentor.bio)}</p>` : ""}
@@ -711,24 +774,24 @@
             <div class="availability-item">${icon('<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>')}<div><strong>Meeting format</strong><span>${escapeHtml(mentor.format || "Ask by email")}</span></div></div>
             ${mentor.rate ? `<div class="availability-item">${icon('<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18m-12 5h4"/>')}<div><strong>Rate</strong><span>${escapeHtml(mentor.rate)}</span></div></div>` : ""}
           </div>
-          ${!isOwn && state.profile?.role === "mentee" ? `<div class="rating-row" aria-label="Private rating">
+          ${!mentor.isDemo && !isOwn && state.profile?.role === "mentee" ? `<div class="rating-row" aria-label="Private rating">
             ${rating ? `<span class="rating-stars" aria-label="${rating.score} out of 5 stars">${"★".repeat(rating.score)}${"☆".repeat(5 - rating.score)}</span><span class="muted">Your private rating: ${rating.score}/5</span>` : '<span class="muted">No rating from you yet</span>'}
             <button class="button secondary small" type="button" data-action="rate-mentor" data-id="${escapeHtml(mentor.id)}">${rating ? "Update private rating" : "Add private rating"}</button>
           </div>${rating?.review ? `<p class="request-details">${escapeHtml(rating.review)}</p>` : ""}<p class="help">Ratings are private to this browser and are not verified or shared with other students.</p>` : ""}
           <div class="card-actions">
-            ${!isOwn ? `<a class="button" href="mailto:${encodeURIComponent(email)}?subject=${contactSubject}&body=${contactBody}">Message / share a file</a><button class="button secondary" type="button" data-action="book-session" data-id="${escapeHtml(mentor.id)}">Request a session</button>` : ""}
-            ${isIncoming ? `<button class="button secondary" type="button" data-action="save-mentor" data-id="${escapeHtml(mentor.id)}">Save mentor</button>` : isOwn ? "" : `<button class="button secondary" type="button" data-action="remove-mentor" data-id="${escapeHtml(mentor.id)}">Remove</button>`}
+            ${mentor.isDemo && !isOwn ? `<button class="button" type="button" data-action="demo-chat" data-id="${escapeHtml(mentor.id)}">Try demo chat</button><button class="button secondary" type="button" data-action="book-session" data-id="${escapeHtml(mentor.id)}">Try demo booking</button>` : !isOwn ? `<a class="button" href="mailto:${encodeURIComponent(email)}?subject=${contactSubject}&body=${contactBody}">Message / share a file</a><button class="button secondary" type="button" data-action="book-session" data-id="${escapeHtml(mentor.id)}">Request a session</button>` : ""}
+            ${mentor.isDemo || isOwn ? "" : isIncoming ? `<button class="button secondary" type="button" data-action="save-mentor" data-id="${escapeHtml(mentor.id)}">Save mentor</button>` : `<button class="button secondary" type="button" data-action="remove-mentor" data-id="${escapeHtml(mentor.id)}">Remove</button>`}
           </div>
-          ${!isOwn ? '<p class="help">Messages and file attachments are handled in your email app, not stored in LNK. A session is not booked until the mentor confirms.</p>' : ""}
+          ${mentor.isDemo && !isOwn ? '<p class="help">This is a fictional bot. Chat replies and bookings are simulated; no real person is contacted.</p>' : !isOwn ? '<p class="help">Messages and file attachments are handled in your email app, not stored in LNK. A session is not booked until the mentor confirms.</p>' : ""}
         </article>`;
       }
 
       function matchingMentors() {
         const savedIds = new Set(state.connections.map((mentor) => mentor.id));
         const incoming = incomingMentor && state.profile.role === "mentee" && !savedIds.has(incomingMentor.id) ? incomingMentor : null;
-        const mentors = [...(incoming ? [incoming] : []), ...state.connections.filter((mentor) => !incoming || mentor.id !== incoming.id)];
-        const query = matchFilters.applied ? matchFilters.query : matchQuery;
-        const queryTerms = matchRequest ? meaningfulTerms(matchQuery) : meaningfulTerms(query);
+        const imported = [...(incoming ? [incoming] : []), ...state.connections.filter((mentor) => !incoming || mentor.id !== incoming.id)];
+        const mentors = [...imported, ...demoMentors];
+        const selectedCourse = matchFilters.applied ? matchFilters.course : (matchRequest ? matchQuery : "");
         const formatMatches = (mentor) => !matchFilters.applied || !matchFilters.format
           || mentor.format === matchFilters.format || mentor.format === "Online or in person";
         const availabilityMatches = (mentor) => !matchFilters.applied || !matchFilters.availability
@@ -742,9 +805,8 @@
         };
         return mentors.filter((mentor) => {
           const subjectText = (mentor.subjects || []).join(" ").toLowerCase();
-          const searchable = `${mentor.name} ${mentor.programme} ${subjectText} ${mentor.bio || ""}`.toLowerCase();
-          const queryMatches = queryTerms.every((term) => matchRequest ? subjectText.includes(term) : searchable.includes(term));
-          return queryMatches
+          const courseMatches = !selectedCourse || subjectText.includes(selectedCourse.toLowerCase());
+          return courseMatches
             && (!matchFilters.applied || !matchFilters.programme || mentor.programme === matchFilters.programme)
             && (!matchFilters.applied || !matchFilters.level || String(mentor.level) === matchFilters.level)
             && formatMatches(mentor)
@@ -758,23 +820,27 @@
         const filteredMentors = selectedMatchId ? mentors.filter((mentor) => mentor.id === selectedMatchId) : mentors;
         const incomingIsNew = Boolean(incomingMentor && state.profile.role === "mentee"
           && !state.connections.some((mentor) => mentor.id === incomingMentor.id));
+        const filterProgramme = matchFilters.programme || state.profile.programme;
+        const filterLevel = matchFilters.level || String(state.profile.level);
+        const courseOptions = coursesFor(filterProgramme, filterLevel);
         return `<p class="eyebrow">Mentee workspace</p><h1>Find a mentor</h1>
-          <p class="intro">Match with tutors whose shared profiles fit your course, study level, availability and meeting format. You can still add a mentor directly with their profile link.</p>
+          <p class="intro">Match with tutors whose shared profiles fit your course, study level, availability and meeting format. You can still add a mentor directly with their profile link or try a clearly labeled demo bot.</p>
           ${incomingIsNew ? `<div class="match-banner"><strong>A mentor profile was shared with you.</strong><p>Review their courses and details, then save the profile or contact them by email.</p></div>` : ""}
           <section class="card match-filters">
             <h2>What kind of mentor are you looking for?</h2>
             <p class="muted">Choose any filters, then match with all suitable shared profiles or pick one at random. Random match only chooses from profiles available below.</p>
             <form data-form="matching">
               <div class="match-filter-grid">
-                <div class="field"><label for="matchSubject">Course or topic</label><input class="input" id="matchSubject" name="query" maxlength="100" placeholder="e.g. data structures" value="${escapeHtml(matchFilters.query || (matchRequest ? matchQuery : ""))}"></div>
+                <div class="field"><label for="matchSubject">Course or topic</label><select class="input" id="matchSubject" name="course"><option value="">Any course</option>${selectOptions(courseOptions, matchFilters.course || (matchRequest ? matchQuery : ""))}</select></div>
                 <div class="field"><label for="matchProgramme">Programme</label><select class="input" id="matchProgramme" name="programme"><option value="">Any programme</option>${selectOptions(Object.keys(programmes), matchFilters.programme)}</select></div>
                 <div class="field"><label for="matchLevel">Mentor study level</label><select class="input" id="matchLevel" name="level"><option value="">Any level</option>${selectOptions(["100", "200", "300", "400"], matchFilters.level)}</select></div>
                 <div class="field"><label for="matchFormat">Meeting format</label><select class="input" id="matchFormat" name="format"><option value="">Any format</option>${selectOptions(["Online", "In person"], matchFilters.format)}</select></div>
-                <div class="field"><label for="matchAvailability">Availability keyword</label><input class="input" id="matchAvailability" name="availability" maxlength="60" placeholder="e.g. weekends" value="${escapeHtml(matchFilters.availability)}"></div>
+                <div class="field"><label for="matchAvailability">Availability</label><select class="input" id="matchAvailability" name="availability"><option value="">Any availability</option>${selectOptions(availabilityOptions(), matchFilters.availability)}</select></div>
                 <div class="field"><label for="matchRate">Session rate</label><select class="input" id="matchRate" name="rate"><option value="">Any rate</option>${selectOptions(["free", "paid"], matchFilters.rate, "")}</select></div>
               </div>
               <div class="match-controls"><button class="button" type="submit">Match me</button><button class="button secondary" type="button" data-action="random-match">Random match</button><button class="button secondary" type="button" data-action="clear-match-filters">Clear filters</button></div>
             </form>
+            <p class="help">Course options are based on the current in-app list, which is not yet a verified complete PAU curriculum. Check the <a href="https://pau.edu.ng/" target="_blank" rel="noopener noreferrer">PAU website</a> and <a href="https://pauarchive.com/dashboard" target="_blank" rel="noopener noreferrer">PAU Archive</a> for current courses; Archive requires an account.</p>
           </section>
           <div class="card">
             <h2>Open a mentor’s shared link</h2>
@@ -782,7 +848,7 @@
             <form class="row-form" data-form="mentor-link"><label class="sr-only" for="mentorLink">Mentor profile link</label><input class="input" id="mentorLink" type="url" name="link" placeholder="Paste the mentor profile link" required><button class="button" type="submit">Find mentor</button></form>
           </div>
           <div class="section-heading match-results"><h2>${selectedMatchId ? (randomMatch ? "Your random match" : "Matching tutor") : "Matching tutors"}</h2><span class="muted">${filteredMentors.length} found</span></div>
-          ${filteredMentors.length ? filteredMentors.map((mentor) => mentorCard(mentor, incomingIsNew && mentor.id === incomingMentor?.id)).join("") : mentors.length || matchFilters.applied ? sectionEmpty("No mentors match those filters", "Try changing a filter, choose Random match again, or paste a mentor profile link above.", null, null) : sectionEmpty("No mentor profiles yet", "Mentors appear here after they share a profile link with you. There is no global directory in this version of LNK.", null, null)}
+          ${filteredMentors.length ? filteredMentors.map((mentor) => mentorCard(mentor, incomingIsNew && mentor.id === incomingMentor?.id)).join("") : sectionEmpty("No mentors match those filters", "Try changing a filter, choose Random match again, or paste a mentor profile link above. Fictional demo bots are listed when filters allow.", null, null)}
           <p class="page-footer">Profile links include the mentor’s contact details. LNK currently matches only profiles shared with you; your filters and random choice run on this device.</p>`;
       }
 
@@ -804,9 +870,31 @@
             <div class="field"><label for="sessionTime">Preferred time</label><input class="input" id="sessionTime" name="time" type="time" required></div>
           </div>
           <div class="field"><label for="sessionMessage">Message <span class="muted">(optional)</span></label><textarea class="input" id="sessionMessage" name="message" maxlength="500" placeholder="What would you like to cover?"></textarea></div>
-          <p class="help">This prepares a booking request in your email app. Your session is not booked until the mentor replies and confirms.</p>
-          <button class="button full" type="submit">Prepare session request</button>
+          <p class="help">${mentor.isDemo ? "This fictional bot will show a simulated confirmation. No tutor is contacted and no real appointment is booked." : "This prepares a booking request in your email app. Your session is not booked until the mentor replies and confirms."}</p>
+          <button class="button full" type="submit">${mentor.isDemo ? "Run demo booking" : "Prepare session request"}</button>
         </form>`;
+      }
+
+      function demoChatMarkup() {
+        const messages = demoChatMessages.map((message) =>
+          `<p class="availability-item"><strong>${message.from === "you" ? "You" : escapeHtml(demoChatMentor.name)}:</strong><span>${escapeHtml(message.text)}</span></p>`
+        ).join("");
+        return `<div aria-live="polite">${messages || '<p class="help">Say hello to try a simulated tutor conversation.</p>'}</div>
+          <form class="modal-form" data-form="demo-chat" data-id="${escapeHtml(demoChatMentor.id)}">
+            <div class="field"><label for="demoMessage">Message the demo bot</label><textarea class="input" id="demoMessage" name="message" maxlength="300" placeholder="Ask a study question..." required></textarea></div>
+            <div class="field"><label for="demoFile">Try attaching a file <span class="muted">(stays on this device)</span></label><input class="input" id="demoFile" name="file" type="file"></div>
+            <p class="help">This is a fictional local chat. Messages and files are not uploaded or sent anywhere.</p>
+            <button class="button full" type="submit">Send demo message</button>
+          </form>`;
+      }
+
+      function updateMatchingCourses(form) {
+        const courseSelect = $("#matchSubject", form);
+        const programme = $("#matchProgramme", form)?.value || state.profile.programme;
+        const level = $("#matchLevel", form)?.value || String(state.profile.level);
+        const previous = courseSelect.value;
+        const courses = coursesFor(programme, level);
+        courseSelect.innerHTML = `<option value="">Any course</option>${selectOptions(courses, courses.includes(previous) ? previous : "")}`;
       }
 
       function matchingAnimation(random) {
@@ -821,7 +909,7 @@
         if (form) {
           const data = new FormData(form);
           matchFilters = {
-            query: String(data.get("query") || "").trim().slice(0, 100),
+            course: String(data.get("course") || ""),
             programme: String(data.get("programme") || ""),
             level: String(data.get("level") || ""),
             format: String(data.get("format") || ""),
@@ -829,7 +917,7 @@
             rate: String(data.get("rate") || ""),
             applied: true
           };
-          matchQuery = matchFilters.query;
+          matchQuery = matchFilters.course;
           matchRequest = false;
         }
         selectedMatchId = "";
@@ -855,7 +943,9 @@
 
       function findMentor(id) {
         if (incomingMentor?.id === id && state.profile.role === "mentee") return incomingMentor;
-        return state.connections.find((mentor) => mentor.id === id) || null;
+        return state.connections.find((mentor) => mentor.id === id)
+          || demoMentors.find((mentor) => mentor.id === id)
+          || null;
       }
 
       function handleMentorRating(form) {
@@ -888,9 +978,33 @@
           showToast("Choose a topic, today or a future date, and a preferred time.");
           return;
         }
+        if (mentor.isDemo) {
+          const booking = { id: uid(), mentorId: mentor.id, subject, date, time, message, createdAt: new Date().toISOString(), demo: true };
+          if (commit((next) => { next.demoBookings.unshift(booking); next.demoBookings = next.demoBookings.slice(0, 50); })) {
+            closeModal();
+            showModal("Demo booking complete", "This is a simulated flow only. No real tutor was contacted and no appointment was booked.", `<section class="card"><span class="badge">DEMO ONLY</span><h3>${escapeHtml(mentor.name)}</h3><p>${escapeHtml(subject)}</p><p class="muted">${escapeHtml(formatDate(date))} at ${escapeHtml(time)}</p><p class="help">In the full LNK service, this step would send a request to a real tutor for confirmation.</p></section>`);
+          }
+          return;
+        }
         const body = encodeURIComponent(`Hello ${mentor.name},\n\nI’d like to request a mentoring session about ${subject}.\nMy preferred time is ${formatDate(date)} at ${time}.\n${message ? `\nA bit more about what I need:\n${message}\n` : ""}\nPlease let me know if you’re available. I understand this request is not a confirmed booking until you reply.\n`);
         const mailto = `mailto:${encodeURIComponent(mentor.email)}?subject=${encodeURIComponent(`LNK session request: ${subject}`)}&body=${body}`;
         showModal("Session request ready", "LNK prepared an email. Open it and choose Send; your session is only booked after the mentor confirms.", `<div class="card"><p><strong>${escapeHtml(mentor.name)}</strong></p><p class="muted">${escapeHtml(subject)} · ${escapeHtml(formatDate(date))} at ${escapeHtml(time)}</p><a class="button full" href="${mailto}">Open email app to request session</a><p class="help">Emailing the request does not guarantee availability. You can attach files in your email app if needed.</p></div>`);
+      }
+
+      function handleDemoChat(form) {
+        const mentor = demoMentors.find((item) => item.id === form.dataset.id);
+        const data = new FormData(form);
+        const message = String(data.get("message") || "").trim();
+        const file = form.elements.namedItem("file")?.files?.[0];
+        if (!mentor || !message || message.length > 300) {
+          showToast("Enter a short message to try demo chat.");
+          return;
+        }
+        demoChatMentor = mentor;
+        demoChatMessages.push({ from: "you", text: file ? `${message} [Attached locally: ${file.name}]` : message });
+        demoChatMessages.push({ from: "bot", text: `Demo reply: Let’s work through that ${mentor.subjects[0]} question together. In the full app, a real tutor would respond here.` });
+        $("#modalContent").innerHTML = demoChatMarkup();
+        $("#demoMessage").focus();
       }
 
       function renderMentorProfile() {
@@ -1396,12 +1510,19 @@
         if (action === "copy-mentor") return shareMentor(true);
         if (action === "random-match") return startMatching(true, $("form[data-form='matching']"));
         if (action === "clear-match-filters") {
-          matchFilters = { query: "", programme: "", level: "", format: "", availability: "", rate: "", applied: false };
+          matchFilters = { course: "", programme: "", level: "", format: "", availability: "", rate: "", applied: false };
           matchQuery = "";
           matchRequest = false;
           selectedMatchId = "";
           randomMatch = false;
           return render();
+        }
+        if (action === "demo-chat") {
+          demoChatMentor = demoMentors.find((mentor) => mentor.id === id) || null;
+          if (!demoChatMentor) return;
+          demoChatMessages = [];
+          showModal("Demo chat · fictional bot", "Try the chat interface. Replies are prewritten examples, not real tutoring.", demoChatMarkup());
+          return;
         }
         if (action === "rate-mentor") {
           const mentor = findMentor(id);
@@ -1431,9 +1552,10 @@
           if (!request) return;
           matchQuery = request.course;
           matchRequest = true;
-          matchFilters = { query: request.course, programme: "", level: "", format: "", availability: "", rate: "", applied: true };
+          matchFilters = { course: request.course, programme: state.profile.programme, level: String(state.profile.level), format: "", availability: "", rate: "", applied: true };
           selectedMatchId = "";
           randomMatch = false;
+          matchRequest = false;
           navigate("matches");
           return startMatching(false);
         }
@@ -1529,6 +1651,7 @@
         if (form.dataset.form === "group") handleGroup(form);
         if (form.dataset.form === "mentor-rating") handleMentorRating(form);
         if (form.dataset.form === "booking") handleBooking(form);
+        if (form.dataset.form === "demo-chat") handleDemoChat(form);
       });
 
       document.addEventListener("input", (event) => {
@@ -1551,6 +1674,11 @@
 
       document.addEventListener("change", (event) => {
         const radio = event.target;
+        if (radio instanceof HTMLSelectElement && radio.closest("form[data-form='matching']")
+          && ["programme", "level"].includes(radio.name)) {
+          updateMatchingCourses(radio.form);
+          return;
+        }
         if (!(radio instanceof HTMLInputElement) || radio.name !== "role" || !radio.checked) return;
         const form = radio.form;
         if (!form || form.dataset.form !== "profile") return;
